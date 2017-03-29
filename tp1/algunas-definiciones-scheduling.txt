@@ -1,0 +1,9 @@
+Objetivos de la política de scheduling:
+
+Ecuanimidad (fairness): que cada proceso reciba una dosis “justa”de CPU (para alguna definición de justicia).
+Eficiencia: tratar de que la CPU esté ocupada todo el tiempo. Carga del sistema: minimizar la cant. de procesos listos que están esperando CPU.
+Tiempo de respuesta: minimizar el tiempo de respuesta percibido por los usuarios interactivos.
+Latencia: minimizar el tiempo requerido para que un proceso empiece a dar resultados.
+Tiempo de ejecución: minimizar el tiempo total que le toma a un proceso ejecutar completamente.
+Rendimiento (throughput): maximizar el número de procesos terminados por unidad de tiempo.
+Liberación de recursos: hacer que terminen cuanto antes los procesos que tiene reservados más recursos.

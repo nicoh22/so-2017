@@ -15,6 +15,9 @@ class SchedRR : public SchedBase {
 
 	private:
 		// Completar
+		queue<int> tasks;
+		vector<int> quantum;
+		vector<int> remaining;
 };
 
 #endif
