@@ -31,7 +31,7 @@ void SchedRR::unblock(int pid)
 }
 
 int SchedRR::tick(int cpu, const enum Motivo m) {
-
+/*
 	int siguiente;
 	if(current_pid(cpu) == IDLE_TASK)
 	{
@@ -62,20 +62,69 @@ int SchedRR::tick(int cpu, const enum Motivo m) {
 
 		return siguiente;
 	}
-
-}
-
-int nextTask() //podria estar piola esta abstraccion
-{
-	int siguiente;
-	if (!tasks.empty())
+*/
+	//Version 2
+	if(tasks.empty)
 	{
-		siguiente = tasks.front();
-		tasks.pop();
+		switch(m)
+		{
+			case BLOCK: 
+				siguiente = IDLE_TASK;
+				break;
+			case EXIT:
+				siguiente = IDLE_TASK;
+				break;
+			case TICK:
+				remaining[cpu]--;
+				if(remaining[cpu] == 0)
+				{
+					siguiente = nextTask();
+				}
+				else
+				{
+					siguiente = current_pid(cpu);
+				}
+				siguiente = current_pid(cpu);
+				break;
+			case default:
+				break;
+		}
 	}
 	else
 	{
-		siguiente = IDLE_TASK;
-	}	
+		switch(m)
+		{
+			case BLOCK:
+				siguiente = nextTask();
+				break;
+			case EXIT:
+				siguiente = nextTask();
+				break;
+			case TICK:
+				remaining[cpu]--;
+				if(remaining[cpu] == 0)
+				{
+					siguiente = nextTask();
+				}
+				else
+				{
+					siguiente = current_pid(cpu);
+				}
+				break;
+			case default:
+				break;
+		}
+		if(remaining[cpu] == 0)
+		{
+			remaining[cpu] = quantum[cpu];
+		}
+	}
+
+}
+
+int nextTask()
+{
+	int siguiente = tasks.front();
+	tasks.pop();
 	return siguiente;
 }
