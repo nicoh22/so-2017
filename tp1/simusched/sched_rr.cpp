@@ -9,6 +9,7 @@ using namespace std;
 SchedRR::SchedRR(vector<int> argn) {
 	// Round robin recibe la cantidad de cores y sus cpu_quantum por parámetro
 	// Cada core tiene un quantum distinto
+	cout << argn[0] << "\n";
 	int cores = argn[1]; //creo que argn[0] tiene el nombre del scheduler
 	for(int i = 2; i < cores; i++)
 	{
@@ -32,25 +33,32 @@ void SchedRR::unblock(int pid)
 }
 
 int SchedRR::tick(int cpu, const enum Motivo m) {
-/*
+
+	//Version 1:
 	int siguiente;
 	if(current_pid(cpu) == IDLE_TASK)
 	{
-		siguiente = nextTask();
-		//Hay que fijarse si esta o no vacia la cola
+		if(tasks.empty())
+		{
+			siguiente = current_pid(cpu);
+		}
+		else
+		{
+			siguiente = nextTask();
+		}
 		return siguiente;
 	}
+
 	if(m == TICK)
 	{
 		remaining[cpu]--;
 		if(remaining[cpu] == 0)
 		{
 			remaining[cpu] = quantum[cpu];
-			if(!tasks.empty)
+			if(!tasks.empty())
 			{
-				siguiente = tasks.front();
-				tasks.pop();
-				tasks.push(current_pid(cpu));
+				siguiente = nextTask(); 
+				load(current_pid(cpu));
 			}
 			else
 			{
@@ -64,10 +72,22 @@ int SchedRR::tick(int cpu, const enum Motivo m) {
 
 		return siguiente;
 	}
-	//Este tiene una falla: 
-*/
+	else
+	{ //BLOCK y EXIT
+		if(tasks.empty())
+		{
+			return IDLE_TASK;
+		}
+		else
+		{
+			return nextTask();
+		}
+	}
+	//Fin version 1
+	
 	//Version 2
-	if(tasks.empty)
+	int siguiente;
+	if(tasks.empty())
 	{
 		switch(m)
 		{
@@ -97,14 +117,21 @@ int SchedRR::tick(int cpu, const enum Motivo m) {
 				break;
 			case TICK:
 				remaining[cpu]--;
-				if(remaining[cpu] == 0)
+				if(current_pid(cpu) == IDLE_TASK)
 				{
 					siguiente = nextTask();
-					load(current_pid(cpu));//y si es la IDLE?
 				}
 				else
 				{
-					siguiente = current_pid(cpu);
+					if(remaining[cpu] == 0)
+					{
+						siguiente = nextTask();
+						load(current_pid(cpu));
+					}
+					else
+					{
+						siguiente = current_pid(cpu);
+					}
 				}
 				break;
 			case default:
@@ -115,11 +142,14 @@ int SchedRR::tick(int cpu, const enum Motivo m) {
 	{
 		remaining[cpu] = quantum[cpu];
 	}
+	return siguiente;
 	//NOTA: Este scheduler si esta en idle va a completar 
 	//el quantum antes de swapear con otra tarea (a lo orga 2)
 	//Me parece igual que eso no es el comportamiento deseado.
 	//Esa logica la deberia agregar bajo el case de TICK.
+	// 1/4: Fixed
 
+	//Nuevos problemas: 
 }
 
 int nextTask()
