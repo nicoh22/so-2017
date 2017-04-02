@@ -55,6 +55,12 @@ void TaskPajarillo(int pid, vector<int> params)
 	return;
 }
 
+void TaskPriorizada(int pid, vector<int> params) { 
+	int tiempo_cpu = params[1];
+	uso_CPU(pid, tiempo_cpu);
+	return;
+}
+
 void tasks_init(void) {
 	/* Todos los tipos de tareas se deben registrar acá para poder ser usadas.
 	 * El segundo parámetro indica la cantidad de parámetros que recibe la tarea
@@ -62,6 +68,8 @@ void tasks_init(void) {
 	register_task(TaskCPU, 1);
 	register_task(TaskIO, 2);
 	register_task(TaskAlterno, -1);
-	register_task(TaskConsola, 3)
-	register_task(TaskPajarillo, 3)
+	register_task(TaskConsola, 3);
+	register_task(TaskPajarillo, 3);
+	register_task(TaskPriorizada, 2);
 }
+
