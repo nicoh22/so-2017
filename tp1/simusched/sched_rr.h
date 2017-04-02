@@ -15,9 +15,10 @@ class SchedRR : public SchedBase {
 
 	private:
 		// Completar
-		queue<int> tasks;
-		vector<int> quantum;
-		vector<int> remaining;
+		std::queue<int> tasks;
+		std::vector<int> quantum;
+		std::vector<int> remaining;
+		int nextTask();
 };
 
 #endif

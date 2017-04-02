@@ -174,7 +174,7 @@ SchedBase* sched_create(const char* sched, vector<int> argn) {
 	 * parámetros que recibe su scheduler como un vector de enteros (vector<int>)
 	 * o ponga -1 para una cantidad de parámetros arbitraria. */
 	_sched_create(SchedFCFS, -1)
-	_sched_create(SchedMistery, -1)
+	//_sched_create(SchedMistery, -1)
 	_sched_create(SchedRR, -1)
 	return NULL;
 }

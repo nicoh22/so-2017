@@ -33,7 +33,7 @@ void SchedRR::unblock(int pid)
 }
 
 int SchedRR::tick(int cpu, const enum Motivo m) {
-
+/*
 	//Version 1:
 	int siguiente;
 	if(current_pid(cpu) == IDLE_TASK)
@@ -84,7 +84,7 @@ int SchedRR::tick(int cpu, const enum Motivo m) {
 		}
 	}
 	//Fin version 1
-	
+*/	
 	//Version 2
 	int siguiente;
 	if(tasks.empty())
@@ -101,7 +101,7 @@ int SchedRR::tick(int cpu, const enum Motivo m) {
 				remaining[cpu]--;
 				siguiente = current_pid(cpu);
 				break;
-			case default:
+			default:
 				break;
 		}
 	}
@@ -134,7 +134,7 @@ int SchedRR::tick(int cpu, const enum Motivo m) {
 					}
 				}
 				break;
-			case default:
+			default:
 				break;
 		}
 	}
@@ -152,7 +152,7 @@ int SchedRR::tick(int cpu, const enum Motivo m) {
 	//Nuevos problemas: 
 }
 
-int nextTask()
+int SchedRR::nextTask()
 {
 	int siguiente = tasks.front();
 	tasks.pop();

@@ -49,8 +49,8 @@ void TaskPajarillo(int pid, vector<int> params)
 	int tiempo_bloqueo = params[2];
 	for(int i = 0; i < cantidad_repeticiones; i++)
 	{
-		uso_CPU(tiempo_cpu);
-		uso_IO(tiempo_bloqueo);
+		uso_CPU(pid, tiempo_cpu);
+		uso_IO(pid, tiempo_bloqueo);
 	}
 	return;
 }
