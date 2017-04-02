@@ -33,59 +33,6 @@ void SchedRR::unblock(int pid)
 }
 
 int SchedRR::tick(int cpu, const enum Motivo m) {
-/*
-	//Version 1:
-	int siguiente;
-	if(current_pid(cpu) == IDLE_TASK)
-	{
-		if(tasks.empty())
-		{
-			siguiente = current_pid(cpu);
-		}
-		else
-		{
-			siguiente = nextTask();
-		}
-		return siguiente;
-	}
-
-	if(m == TICK)
-	{
-		remaining[cpu]--;
-		if(remaining[cpu] == 0)
-		{
-			remaining[cpu] = quantum[cpu];
-			if(!tasks.empty())
-			{
-				siguiente = nextTask(); 
-				load(current_pid(cpu));
-			}
-			else
-			{
-				siguiente = IDLE_TASK;
-			}
-		}
-		else
-		{
-			siguiente = current_pid(cpu);
-		}
-
-		return siguiente;
-	}
-	else
-	{ //BLOCK y EXIT
-		if(tasks.empty())
-		{
-			return IDLE_TASK;
-		}
-		else
-		{
-			return nextTask();
-		}
-	}
-	//Fin version 1
-*/	
-	//Version 2
 	int siguiente;
 	if(tasks.empty())
 	{
@@ -149,8 +96,8 @@ int SchedRR::tick(int cpu, const enum Motivo m) {
 	//Me parece igual que eso no es el comportamiento deseado.
 	//Esa logica la deberia agregar bajo el case de TICK.
 	// 1/4: Fixed
-
-	//Nuevos problemas: 
+	// 3/4: Fix. Cuando se sale de la tarea idle para ejecutar una tarea 
+	// no se reseteaba el quantum.  
 }
 
 int SchedRR::nextTask()
