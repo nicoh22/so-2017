@@ -116,13 +116,14 @@ int SchedRR::tick(int cpu, const enum Motivo m) {
 				siguiente = nextTask();
 				break;
 			case TICK:
-				remaining[cpu]--;
 				if(current_pid(cpu) == IDLE_TASK)
 				{
 					siguiente = nextTask();
+					remaining[cpu] = quantum[cpu];
 				}
 				else
 				{
+					remaining[cpu]--;
 					if(remaining[cpu] == 0)
 					{
 						siguiente = nextTask();
