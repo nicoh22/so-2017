@@ -7,8 +7,8 @@ MAIN=simusched
 
 .PHONY: all clean new
 all: $(MAIN)
-#sched_mistery.o
-$(MAIN): $(OBJS) 
+
+$(MAIN): $(OBJS) sched_mistery.o
 	$(CXX) $(CXXFLAGS) -o $@ $^ $(LDFLAGS)
 
 %.o: %.cpp %.h basesched.h
