@@ -9,7 +9,7 @@ struct Tuple {
 	int pid;
 	int prior;
 	int cpu;
-}
+};
 
 bool porPrior (Tuple a,Tuple b) { return (a.prior > b.prior); }
 bool porCpu (Tuple a,Tuple b) { return (a.cpu > b.cpu); }
@@ -24,7 +24,7 @@ class SchedPSJF : public SchedBase {
 
 	private:
 		// Completar
-		std::queue<Tuple> tasks;
+		std::vector<Tuple> tasks;
 		int nextTask();
 };
 

@@ -1,12 +1,14 @@
 #include <vector>
+#include <iterator>
 #include <queue>
 #include "sched_psjf.h"
 #include "basesched.h"
 #include <iostream>
+#include <algorithm>
 
 using namespace std;
 
-SchedRR::SchedRR(vector<int> argn) {
+SchedPSJF::SchedPSJF(vector<int> argn) {
 	// Round robin recibe la cantidad de cores y sus cpu_quantum por parámetro
 	// Cada core tiene un quantum distinto
 	/*
@@ -18,37 +20,35 @@ SchedRR::SchedRR(vector<int> argn) {
 		remaining.push_back(argn[i]);
 	}
 	*/
-	remaining.push_back(3);
-	remaining.push_back(5);	
 }
 
-SchedRR::~SchedRR() {
+SchedPSJF::~SchedPSJF() {
 
 }
 
-void SchedRR::load(int pid) {
+void SchedPSJF::load(int pid) {
 	Tuple t;
 	
 	t.pid = pid;	
 
-	std::vector<int> params = tsk_params(pid);
+	std::vector<int> *params = tsk_params(pid);
 	
-	tPrior.prior = params[0];
-	tPrior.cpu = params[1];
+	t.prior = (*params)[0];
+	t.cpu = (*params)[1];
 
-	tasks.push(t);
-	std::stable_sort(std::begin(tasks), std::end(tasks), porPrior);
-	std::stable_sort(std::begin(tasks), std::end(tasks), porCpu);
+	tasks.push_back(t);
+	std::stable_sort(tasks.begin(), tasks.end(), porCpu);
+	std::stable_sort(tasks.begin(), tasks.end(), porPrior);
 }
 
-void SchedRR::unblock(int pid) 
+void SchedPSJF::unblock(int pid) 
 {
 	load(pid);
 }
 
-int SchedRR::tick(int cpu, const enum Motivo m) {
+int SchedPSJF::tick(int cpu, const enum Motivo m) {
 	int siguiente;
-	if(tasks_prior.empty())
+	if(tasks.empty())
 	{
 		switch(m)
 		{
@@ -69,8 +69,12 @@ int SchedRR::tick(int cpu, const enum Motivo m) {
 	{
 		switch(m)
 		{
-			case BLOCK:
-				siguiente = nextTask();
+			case BLOCK:{
+					int actual = current_pid(cpu);
+					load(actual);					
+					siguiente = nextTask();				
+				}
+				
 				break;
 			case EXIT:
 				siguiente = nextTask();
@@ -85,16 +89,16 @@ int SchedRR::tick(int cpu, const enum Motivo m) {
 					int actual = current_pid(cpu);
 					Tuple t = tasks.front();
 
-					vector<int> params = tsk_params(actual);
+					vector<int> *params = tsk_params(actual);
 
-					if (t.prior > params[0]) {
-						tasks.pop();
+					if (t.prior > (*params)[0]) {
+						tasks.erase(tasks.begin());
 						siguiente = t.pid;
 						load(actual);
 					}else {
-						if (t.prior == params[0]) {
-							if (t.cpu < params[1]) {
-								tasks.pop();
+						if (t.prior == (*params)[0]) {
+							if (t.cpu < (*params)[1]) {
+								tasks.erase(tasks.begin());
 								siguiente = t.pid;
 								load(actual);
 							}else {
@@ -110,19 +114,13 @@ int SchedRR::tick(int cpu, const enum Motivo m) {
 				break;
 		}
 	}
-	return siguiente;
-	//NOTA: Este scheduler si esta en idle va a completar 
-	//el quantum antes de swapear con otra tarea (a lo orga 2)
-	//Me parece igual que eso no es el comportamiento deseado.
-	//Esa logica la deberia agregar bajo el case de TICK.
-	// 1/4: Fixed
-	// 3/4: Fix. Cuando se sale de la tarea idle para ejecutar una tarea 
-	// no se reseteaba el quantum.  
+
+	return siguiente;  
 }
 
-int SchedRR::nextTask()
+int SchedPSJF::nextTask()
 {
 	Tuple t = tasks.front();
-	tasks.pop();
-	return siguiente;
+	tasks.erase(tasks.begin());
+	return t.pid;
 }

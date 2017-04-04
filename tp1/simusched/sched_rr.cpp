@@ -63,7 +63,11 @@ int SchedRR::tick(int cpu, const enum Motivo m) {
 	{
 		switch(m)
 		{
-			case BLOCK:
+			case BLOCK: {
+					int actual = current_pid(cpu);
+					load(actual);					
+					siguiente = nextTask();				
+				}
 				siguiente = nextTask();
 				break;
 			case EXIT:
