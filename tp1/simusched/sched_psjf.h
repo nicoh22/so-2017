@@ -1,5 +1,5 @@
-#ifndef __SCHED_RR__
-#define __SCHED_RR__
+#ifndef __SCHED_PSJF__
+#define __SCHED_PSJF__
 
 #include <vector>
 #include <queue>
@@ -10,9 +10,6 @@ struct Tuple {
 	int prior;
 	int cpu;
 };
-
-bool porPrior (Tuple a,Tuple b) { return (a.prior > b.prior); }
-bool porCpu (Tuple a,Tuple b) { return (a.cpu > b.cpu); }
 
 class SchedPSJF : public SchedBase {
 	public:

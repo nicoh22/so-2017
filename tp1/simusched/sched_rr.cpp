@@ -22,7 +22,6 @@ SchedRR::SchedRR(vector<int> argn) {
 	quantum.push_back(5);
 	remaining.push_back(3);
 	remaining.push_back(5);
-	
 }
 
 SchedRR::~SchedRR() {
@@ -63,11 +62,7 @@ int SchedRR::tick(int cpu, const enum Motivo m) {
 	{
 		switch(m)
 		{
-			case BLOCK: {
-					int actual = current_pid(cpu);
-					load(actual);					
-					siguiente = nextTask();				
-				}
+			case BLOCK: 
 				siguiente = nextTask();
 				break;
 			case EXIT:

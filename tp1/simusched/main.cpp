@@ -12,6 +12,7 @@
 
 #include "sched_fcfs.h"
 #include "sched_rr.h"
+#include "sched_psjf.h"
 #include "sched_mistery.h"
 
 using namespace std;
@@ -176,6 +177,14 @@ SchedBase* sched_create(const char* sched, vector<int> argn) {
 	_sched_create(SchedFCFS, -1)
 	_sched_create(SchedMistery, -1)
 	_sched_create(SchedRR, -1)
+	_sched_create(SchedPSJF, -1)
+	/*if (!strcmp("SchedPSJF", sched)) {
+		if (!(-1 == -1 || (int)(argn.size()) == -1)) {
+			cerr << "error: SchedPSJF recibe " << -1 << " parámetro(s)." << endl;
+			return NULL;
+		}
+		return new SchedPSJF(argn);
+	}*/
 	return NULL;
 }
 
@@ -185,8 +194,8 @@ int main(int argc, char* argv[]) {
 	int rc = cmdline_parse(argc, argv, settings);
 	if(rc != 0) return rc;
 
-	//Obtengo el scheduler a usar.
-	SchedBase *scheduler = sched_create(settings.sched_class.c_str(), settings.sched_args);
+	//Obtengo el scheduler a usar.	
+	SchedBase *scheduler = sched_create(settings.sched_class.c_str(), settings.sched_args);	
 	if(!scheduler) {
 		cerr << "error: scheduler desconocido: " << settings.sched_class;
 		for(int j=0; j<(int)settings.sched_args.size(); j++) cerr << (j?',':'(') << settings.sched_args[j];

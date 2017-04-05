@@ -8,6 +8,9 @@
 
 using namespace std;
 
+bool porPrior (Tuple a,Tuple b) { return (a.prior > b.prior); }
+bool porCpu (Tuple a,Tuple b) { return (a.cpu > b.cpu); }
+
 SchedPSJF::SchedPSJF(vector<int> argn) {
 	// Round robin recibe la cantidad de cores y sus cpu_quantum por parámetro
 	// Cada core tiene un quantum distinto
@@ -69,12 +72,8 @@ int SchedPSJF::tick(int cpu, const enum Motivo m) {
 	{
 		switch(m)
 		{
-			case BLOCK:{
-					int actual = current_pid(cpu);
-					load(actual);					
-					siguiente = nextTask();				
-				}
-				
+			case BLOCK:
+				siguiente = nextTask();
 				break;
 			case EXIT:
 				siguiente = nextTask();
