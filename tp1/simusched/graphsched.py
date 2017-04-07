@@ -25,13 +25,13 @@ LOAD, CPU, BLOCK, UNBLOCK, EXIT, DEADLINE = range(6)
 COLOR_GRAY = ('#a0a0a0', '#d0d0d0')
 COLOR_BLACK = '#000000'
 COLORS = [
-	('#c0ffc0', '#e7ffe7'), # Verde claro
-	('#0000ff', '#b7b7f7'), # Azul
-	('#ff0000', '#f7b7b7'), # Rojo
-	('#d0d0d0', '#f4f4f4'), # Gris
-	('#00e000', '#b7efb7'), # Verde
-	('#ffff00', '#f7f7b7'), # Amarillo
-	('#c0c0ff', '#e7e7ff'), # Azul claro
+	('#b7efb7', '#00e000'), # Verde
+	('#f7f7b7', '#ffff00'), # Amarillo
+	('#f7b7b7', '#ff0000'), # Rojo
+	('#b7b7f7', '#0000ff'), # Azul
+	('#f4f4f4', '#d0d0d0'), # Gris
+	('#e7ffe7', '#c0ffc0'), # Verde claro
+	('#e7e7ff', '#c0c0ff')  # Azul claro
 ]
 
 STATES = ['READY', 'BLOCKED', 'RUNNING', 'UNLOADED']
