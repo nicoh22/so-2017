@@ -5,10 +5,11 @@
 #include "basesched.h"
 #include <iostream>
 #include <algorithm>
+#include <iostream>
 
 using namespace std;
 
-bool porPrior (Tuple a,Tuple b) { return (a.prior > b.prior); }
+bool porPrior (Tuple a,Tuple b) { return (a.prior < b.prior); }
 bool porCpu (Tuple a,Tuple b) { return (a.cpu > b.cpu); }
 
 SchedPSJF::SchedPSJF(vector<int> argn) {
@@ -40,8 +41,7 @@ void SchedPSJF::load(int pid) {
 	t.cpu = (*params)[1];
 
 	tasks.push_back(t);
-	std::stable_sort(tasks.begin(), tasks.end(), porCpu);
-	std::stable_sort(tasks.begin(), tasks.end(), porPrior);
+	sort();
 }
 
 void SchedPSJF::unblock(int pid) 
@@ -90,20 +90,42 @@ int SchedPSJF::tick(int cpu, const enum Motivo m) {
 
 					vector<int> *params = tsk_params(actual);
 
-					if (t.prior > (*params)[0]) {
-						tasks.erase(tasks.begin());
+					// MARK: Mas bajo mas prioritario
+					if (t.prior < (*params)[0]) {
+						cout << "< prior entra " << t.pid
+					 	     << " prior " << t.prior
+					 	     << " sale " << actual
+					 	     << " prior " << (*params)[0]
+					 	     << "\n";
+						pop();
 						siguiente = t.pid;
 						load(actual);
 					}else {
 						if (t.prior == (*params)[0]) {
+						cout << "== prior entra " << t.pid
+					 	     << " prior " << t.prior
+					 	     << " sale " << actual
+					 	     << " prior " << (*params)[0]
+					 	     << "\n";
 							if (t.cpu < (*params)[1]) {
-								tasks.erase(tasks.begin());
+							cout << "< cpu entra " << t.cpu
+							     << "cpu sale " << (*params)[1]
+							     << "\n";
+								pop();
 								siguiente = t.pid;
 								load(actual);
 							}else {
+							cout << ">= cpu cont " << (*params)[1]
+							     << "cpu front " << t.cpu
+							     << "\n";
 								siguiente = actual;
 							}
 						}else {
+						cout << "> cont " << actual
+					 	     << " prior " << (*params)[0]
+					 	     << " front " << t.pid
+					 	     << " prior " << t.prior
+					 	     << "\n";
 							siguiente = actual;			
 						}
 					}	
@@ -120,6 +142,15 @@ int SchedPSJF::tick(int cpu, const enum Motivo m) {
 int SchedPSJF::nextTask()
 {
 	Tuple t = tasks.front();
-	tasks.erase(tasks.begin());
+	pop();
 	return t.pid;
+}
+
+void SchedPSJF::pop() {
+	tasks.erase(tasks.begin());
+}
+
+void SchedPSJF::sort() {
+	std::stable_sort(tasks.begin(), tasks.end(), porCpu);
+	std::stable_sort(tasks.begin(), tasks.end(), porPrior);
 }

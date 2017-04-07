@@ -23,6 +23,8 @@ class SchedPSJF : public SchedBase {
 		// Completar
 		std::vector<Tuple> tasks;
 		int nextTask();
+		void pop();
+		void sort();
 };
 
 #endif
