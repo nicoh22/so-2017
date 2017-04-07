@@ -10,7 +10,7 @@
 using namespace std;
 
 bool porPrior (Tuple a,Tuple b) { return (a.prior < b.prior); }
-bool porCpu (Tuple a,Tuple b) { return (a.cpu > b.cpu); }
+bool porCpu (Tuple a,Tuple b) { return (a.cpu < b.cpu); }
 
 SchedPSJF::SchedPSJF(vector<int> argn) {
 	// Round robin recibe la cantidad de cores y sus cpu_quantum por parámetro
@@ -92,37 +92,37 @@ int SchedPSJF::tick(int cpu, const enum Motivo m) {
 
 					// MARK: Mas bajo mas prioritario
 					if (t.prior < (*params)[0]) {
-						cout << "< prior entra " << t.pid
-					 	     << " prior " << t.prior
-					 	     << " sale " << actual
-					 	     << " prior " << (*params)[0]
+						cout << " entra front " << t.pid
+					 	     << " con prior " << t.prior
+					 	     << " sale actual " << actual
+					 	     << " con prior " << (*params)[0]
 					 	     << "\n";
 						pop();
 						siguiente = t.pid;
 						load(actual);
 					}else {
 						if (t.prior == (*params)[0]) {
-						cout << "== prior entra " << t.pid
+						cout << " front " << t.pid
 					 	     << " prior " << t.prior
-					 	     << " sale " << actual
+					 	     << " actual " << actual
 					 	     << " prior " << (*params)[0]
 					 	     << "\n";
 							if (t.cpu < (*params)[1]) {
-							cout << "< cpu entra " << t.cpu
-							     << "cpu sale " << (*params)[1]
+							cout << " entra front con cpu " << t.cpu
+							     << " sale actual con cpu " << (*params)[1]
 							     << "\n";
 								pop();
 								siguiente = t.pid;
 								load(actual);
 							}else {
-							cout << ">= cpu cont " << (*params)[1]
-							     << "cpu front " << t.cpu
+							cout << " cont actual con cpu " << (*params)[1]
+							     << " front cpu " << t.cpu
 							     << "\n";
 								siguiente = actual;
 							}
 						}else {
-						cout << "> cont " << actual
-					 	     << " prior " << (*params)[0]
+						cout << " cont actual " << actual
+					 	     << " con prior " << (*params)[0]
 					 	     << " front " << t.pid
 					 	     << " prior " << t.prior
 					 	     << "\n";
