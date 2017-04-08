@@ -1,0 +1,7 @@
+TaskCPU 50
+@3:
+TaskCPU 15
+@10:
+*2 TaskCPU 5
+@15:
+TaskCPU 1

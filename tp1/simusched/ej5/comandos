@@ -1,0 +1,18 @@
+ 1869  cd simusched/
+ 1886  cd tp1/simusched/
+ 1889  vim simusched.cpp 
+ 1916  cd simusched/
+ 1964  cd tp1/simusched/
+ 1970  ./simusched ej5/sencillo.tsk 1 1 0 SchedMistery | ./graphsched.py > ej5/sencillo.png
+ 1971  ./simusched ej5/sencillo.tsk 1 1 0 SchedMistery 1 1
+ 1989  cd dev/so-2017/tp1/simusched/
+ 2000  cd dev/so-2017/tp1/simusched/
+ 2006  git rm simusched
+ 2007  git rm -f simusched
+ 2015  ./simusched ej5/sencillo.tsk 1 1 0 SchedMistery
+ 2016  ./simusched ej5/sencillo.tsk 1 1 0 SchedMistery | python2 graphsched.py > ej5/sencillo.png
+ 2017  ./simusched ej5/tareasDistintasMayor.tsk 1 1 0 SchedMistery | python2 graphsched.py > ej5/tareasDistintasMayor.png
+ 2018  ./simusched ej5/tareasDistintasMenor.tsk 1 1 0 SchedMistery | python2 graphsched.py > ej5/tareasDistintasMenor.png
+ 2019  ./simusched ej5/tareasIgualesCortas.tsk 1 1 0 SchedMistery | python2 graphsched.py > ej5/taresIgualesCortas.png
+ 2020  ./simusched ej5/tareasIgualesLargas.tsk 1 1 0 SchedMistery | python2 graphsched.py > ej5/taresIgualesLargas.png
+ 2022  history | grep simusched > ej5/comandos 
