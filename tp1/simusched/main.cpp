@@ -14,6 +14,7 @@
 #include "sched_rr.h"
 #include "sched_psjf.h"
 #include "sched_mistery.h"
+#include "sched_no_mistery.h"
 
 using namespace std;
 
@@ -178,6 +179,7 @@ SchedBase* sched_create(const char* sched, vector<int> argn) {
 	_sched_create(SchedMistery, -1)
 	_sched_create(SchedRR, -1)
 	_sched_create(SchedPSJF, -1)
+	_sched_create(SchedNoMistery, -1)
 	/*if (!strcmp("SchedPSJF", sched)) {
 		if (!(-1 == -1 || (int)(argn.size()) == -1)) {
 			cerr << "error: SchedPSJF recibe " << -1 << " parámetro(s)." << endl;

@@ -1,5 +1,5 @@
-./simusched ej5/tareasDistintasMayor.tsk 2 1 0 SchedMistery | python2 graphsched.py > ej5/tareasDistintasMayor2cores.png
-./simusched ej5/tareasDistintasMenor.tsk 2 1 0 SchedMistery | python2 graphsched.py > ej5/tareasDistintasMenor2cores.png
-./simusched ej5/tareasIgualesCortas.tsk 2 1 0 SchedMistery | python2 graphsched.py > ej5/tareasIgualesCortas2cores.png
-./simusched ej5/tareasIgualesLargas.tsk 2 1 0 SchedMistery | python2 graphsched.py > ej5/tareasIgualesLargas2cores.png
-./simusched ej5/tareaLargaLuegoCortas.tsk 2 1 0 SchedMistery | python2 graphsched.py > ej5/tareaLargaLuegoCortas2cores.png
+./simusched ej5/tareasDistintasMayor.tsk 1 1 0 SchedNoMistery | python2 graphsched.py > ej5/NMDistintasMayor1cores.png
+./simusched ej5/tareasDistintasMenor.tsk 1 1 0 SchedNoMistery | python2 graphsched.py > ej5/NMDistintasMenor1cores.png
+./simusched ej5/tareasIgualesCortas.tsk 1 1 0 SchedNoMistery | python2 graphsched.py > ej5/NMIgualesCortas1cores.png
+./simusched ej5/tareasIgualesLargas.tsk 1 1 0 SchedNoMistery | python2 graphsched.py > ej5/NMIgualesLargas1cores.png
+./simusched ej5/tareaLargaLuegoCortas.tsk 1 1 0 SchedNoMistery | python2 graphsched.py > ej5/NMLargaLuegoCortas1cores.png
