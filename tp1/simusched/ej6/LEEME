@@ -1,0 +1,8 @@
+Menos = Decreciente
+Mas = Creciente
+
+img<Nombre Test><xxx = Parametros Ejecucion>
+
+Creo que los que estan marcados con * son los que tienen que ir seguro para cada ejemplo. Es decir el caso con 1 core y el caso con un core para cada tarea. Se podria mostrar el desastre que deja el caso con 2 ó 3 cores, para todos o para uno de los casos... da igual pero sin explicar porque es alto lio.
+
+Hay para 1 y 2 cores tests hechos usando cambio de contexto y cambio de core > 0. No se si sirva de algo incluirlos en el informe pero talvez si en los tests que el profesor pueda ver.
