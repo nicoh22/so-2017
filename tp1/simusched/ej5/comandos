@@ -1,0 +1,5 @@
+./simusched ej5/tareasDistintasMayor.tsk 2 1 0 SchedMistery | python2 graphsched.py > ej5/tareasDistintasMayor2cores.png
+./simusched ej5/tareasDistintasMenor.tsk 2 1 0 SchedMistery | python2 graphsched.py > ej5/tareasDistintasMenor2cores.png
+./simusched ej5/tareasIgualesCortas.tsk 2 1 0 SchedMistery | python2 graphsched.py > ej5/tareasIgualesCortas2cores.png
+./simusched ej5/tareasIgualesLargas.tsk 2 1 0 SchedMistery | python2 graphsched.py > ej5/tareasIgualesLargas2cores.png
+./simusched ej5/tareaLargaLuegoCortas.tsk 2 1 0 SchedMistery | python2 graphsched.py > ej5/tareaLargaLuegoCortas2cores.png
