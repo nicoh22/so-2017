@@ -40,14 +40,17 @@ int SchedRR::tick(int cpu, const enum Motivo m) {
 		switch(m)
 		{
 			case BLOCK: 
-				siguiente = IDLE_TASK;
-				break;
 			case EXIT:
 				siguiente = IDLE_TASK;
+				remaining[cpu] = quantum[cpu];
 				break;
 			case TICK:
 				remaining[cpu]--;
 				siguiente = current_pid(cpu);
+				if(remaining[cpu] == 0)
+				{
+					remaining[cpu] = quantum[cpu];
+				}
 				break;
 			default:
 				break;
@@ -58,10 +61,9 @@ int SchedRR::tick(int cpu, const enum Motivo m) {
 		switch(m)
 		{
 			case BLOCK: 
-				siguiente = nextTask();
-				break;
 			case EXIT:
 				siguiente = nextTask();
+				remaining[cpu] = quantum[cpu];
 				break;
 			case TICK:
 				if(current_pid(cpu) == IDLE_TASK)
@@ -76,6 +78,7 @@ int SchedRR::tick(int cpu, const enum Motivo m) {
 					{
 						siguiente = nextTask();
 						load(current_pid(cpu));
+						remaining[cpu] = quantum[cpu];
 					}
 					else
 					{
@@ -86,10 +89,6 @@ int SchedRR::tick(int cpu, const enum Motivo m) {
 			default:
 				break;
 		}
-	}
-	if(remaining[cpu] == 0)
-	{
-		remaining[cpu] = quantum[cpu];
 	}
 	return siguiente;
 	//NOTA: Este scheduler si esta en idle va a completar 
