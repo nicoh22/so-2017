@@ -11,8 +11,8 @@ SchedRR::SchedRR(vector<int> argn) {
 	// Cada core tiene un quantum distinto
 
 	//cout << argn[0] << "\n";
-	int cores = argn[0]; //creo que argn[0] tiene el nombre del scheduler
-	for(int i = 1; i < 1+cores; i++)
+	int cores = argn[1]; //creo que argn[0] tiene el nombre del scheduler
+	for(int i = 2; i < 2+cores; i++)
 	{
 		quantum.push_back(argn[i]);
 		remaining.push_back(argn[i]);
