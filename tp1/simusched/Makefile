@@ -4,6 +4,7 @@ LDFLAGS= -lpthread
 
 OBJS=main.o simu.o basesched.o basetask.o tasks.o sched_fcfs.o sched_rr.o sched_psjf.o sched_no_mistery.o
 MAIN=simusched
+GRAPH=./graphsched.py
 
 .PHONY: all clean new
 all: $(MAIN)
@@ -23,3 +24,14 @@ clean:
 	rm -f $(OBJS) $(MAIN)
 
 new: clean all
+
+ejercicio1: all
+	./$(MAIN) lote.tsk 1 0 5 SchedFCFS | $(GRAPH) > ej1/ej1.png
+
+ejercicio2: all
+	for CORES in 1 2 3 ; do \
+		./$(MAIN) ej2/loteFCFS.tsk $$CORES 2 0 SchedFCFS | $(GRAPH) > ej2/$$COREScore.png ; \
+	done
+
+ejercicio3: 
+
