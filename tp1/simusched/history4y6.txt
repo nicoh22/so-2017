@@ -55,3 +55,11 @@
  1606  ./simusched ej7/loteMasPrioMenosCpuLargo.tsk 2 1 0 SchedPSJF | ./graphsched.py > ej7/imgPSJFMasPrioMenosCpuLargo2Core.png
  1609  ./simusched ej7/loteMenosPrioMasCpuLargo.tsk 1 1 0 SchedPSJF | ./graphsched.py > ej7/imgPSJFMenosPrioMasCpuLargo1Core.png
  1608  ./simusched ej7/loteMenosPrioMasCpuLargo.tsk 2 1 0 SchedPSJF | ./graphsched.py > ej7/imgPSJFMenosPrioMasCpuLargo2Core.png
+ 1636  ./simusched ej4/loteMenosCpu.tsk 2 0 0 SchedRR 2 1 1 | ./graphsched.py > ej4/imgMenosCpu200a.png
+ 1637  ./simusched ej4/loteMenosCpu.tsk 2 0 0 SchedRR 2 11 11 | ./graphsched.py > ej4/imgMenosCpu200b.png
+ 1638  ./simusched ej4/loteMasCpu.tsk 2 0 0 SchedRR 2 1 1 | ./graphsched.py > ej4/imgMasCpu200a.png
+ 1639  ./simusched ej4/loteMasCpu.tsk 2 0 0 SchedRR 2 11 11 | ./graphsched.py > ej4/imgMasCpu200b.png
+ 1652  ./simusched ej4/loteMasCpuMenosBloqueo2.tsk 1 0 0 SchedRR 1 2 | ./graphsched.py > ej4/imgMasCpuMenosBloqueo1002b.png
+ 1653  ./simusched ej4/loteMasCpuMenosBloqueo2.tsk 2 0 0 SchedRR 2 2 2 | ./graphsched.py > ej4/imgMasCpuMenosBloqueo2002b.png
+ 1654  ./simusched ej4/loteMasCpuMenosBloqueo2.tsk 3 0 0 SchedRR 3 2 2 2 | ./graphsched.py > ej4/imgMasCpuMenosBloqueo3002b.png
+ 1655  ./simusched ej4/loteMasCpuMenosBloqueo2.tsk 4 0 0 SchedRR 4 2 2 2 2 | ./graphsched.py > ej4/imgMasCpuMenosBloqueo4002b.png
