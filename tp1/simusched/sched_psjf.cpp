@@ -92,41 +92,20 @@ int SchedPSJF::tick(int cpu, const enum Motivo m) {
 
 					// MARK: Mas bajo mas prioritario
 					if (t.prior < (*params)[0]) {
-						cout << " entra front " << t.pid
-					 	     << " con prior " << t.prior
-					 	     << " sale actual " << actual
-					 	     << " con prior " << (*params)[0]
-					 	     << "\n";
 						pop();
 						siguiente = t.pid;
 						load(actual);
 					}else {
 						if (t.prior == (*params)[0]) {
-						cout << " front " << t.pid
-					 	     << " prior " << t.prior
-					 	     << " actual " << actual
-					 	     << " prior " << (*params)[0]
-					 	     << "\n";
 							if (t.cpu < (*params)[1]) {
-							cout << " entra front con cpu " << t.cpu
-							     << " sale actual con cpu " << (*params)[1]
-							     << "\n";
 								pop();
 								siguiente = t.pid;
 								load(actual);
 							}else {
-							cout << " cont actual con cpu " << (*params)[1]
-							     << " front cpu " << t.cpu
-							     << "\n";
 								siguiente = actual;
 							}
 						}else {
-						cout << " cont actual " << actual
-					 	     << " con prior " << (*params)[0]
-					 	     << " front " << t.pid
-					 	     << " prior " << t.prior
-					 	     << "\n";
-							siguiente = actual;			
+							siguiente = actual;
 						}
 					}	
 				}
@@ -136,7 +115,7 @@ int SchedPSJF::tick(int cpu, const enum Motivo m) {
 		}
 	}
 
-	return siguiente;  
+	return siguiente;
 }
 
 int SchedPSJF::nextTask()
