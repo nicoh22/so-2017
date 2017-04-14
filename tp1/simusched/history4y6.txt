@@ -63,3 +63,17 @@
  1653  ./simusched ej4/loteMasCpuMenosBloqueo2.tsk 2 0 0 SchedRR 2 2 2 | ./graphsched.py > ej4/imgMasCpuMenosBloqueo2002b.png
  1654  ./simusched ej4/loteMasCpuMenosBloqueo2.tsk 3 0 0 SchedRR 3 2 2 2 | ./graphsched.py > ej4/imgMasCpuMenosBloqueo3002b.png
  1655  ./simusched ej4/loteMasCpuMenosBloqueo2.tsk 4 0 0 SchedRR 4 2 2 2 2 | ./graphsched.py > ej4/imgMasCpuMenosBloqueo4002b.png
+ 1676  ./simusched ej7/ConBloqueo/loteMasCpuMenosBloqueo.tsk 1 1 0 SchedRR 1 5 | ./graphsched.py > ej7/ConBloqueo/imgRRMasCpuMenosBloqueo1Core.png
+ 1675  ./simusched ej7/ConBloqueo/loteMasCpuMenosBloqueo.tsk 2 1 0 SchedRR 2 5 5 | ./graphsched.py > ej7/ConBloqueo/imgRRMasCpuMenosBloqueo2Core.png
+ 1677  ./simusched ej7/ConBloqueo/loteMasCpuMenosBloqueo.tsk 1 1 0 SchedNoMistery | ./graphsched.py > ej7/ConBloqueo/imgNMMasCpuMenosBloqueo1Core.png
+ 1678  ./simusched ej7/ConBloqueo/loteMasCpuMenosBloqueo.tsk 2 1 0 SchedNoMistery | ./graphsched.py > ej7/ConBloqueo/imgNMMasCpuMenosBloqueo2Core.png
+ 1679  ./simusched ej7/ConBloqueo/loteMenosPrioMasCpuMasBloqueo.tsk 1 1 0 SchedPSJF | ./graphsched.py > ej7/ConBloqueo/imgPSJFMenosPrioMasCpuMasBloqueo1Core.png
+ 1684  ./simusched ej7/ConBloqueo/loteMenosPrioMasCpuMasBloqueo.tsk 1 1 0 SchedPSJF | ./graphsched.py > ej7/ConBloqueo/imgPSJFMenosPrioMasCpuMasBloqueo1Core.png
+ 1685  ./simusched ej7/ConBloqueo/loteMenosPrioMasCpuMasBloqueo.tsk 2 1 0 SchedPSJF | ./graphsched.py > ej7/ConBloqueo/imgPSJFMenosPrioMasCpuMasBloqueo2Core.png
+ 1690  ./simusched ej7/ConBloqueo/loteMenosPrioMasCpuMenosBloqueo.tsk 1 1 0 SchedPSJF | ./graphsched.py > ej7/ConBloqueo/imgPSJFMenosPrioMasCpuMenosBloqueo1Core.png
+ 1691  ./simusched ej7/ConBloqueo/loteMenosPrioMasCpuMenosBloqueo.tsk 2 1 0 SchedPSJF | ./graphsched.py > ej7/ConBloqueo/imgPSJFMenosPrioMasCpuMenosBloqueo2Core.png
+ 1694  ./simusched ej7/ConBloqueo/loteMasCpuMasBloqueo.tsk 1 1 0 SchedRR 1 5 | ./graphsched.py > ej7/ConBloqueo/imgRRMasCpuMasBloqueo1Core.png
+ 1697  ./simusched ej7/ConBloqueo/loteMasCpuMasBloqueo.tsk 2 1 0 SchedRR 2 5 5 | ./graphsched.py > ej7/ConBloqueo/imgRRMasCpuMasBloqueo2Core.png
+ 1699  ./simusched ej7/ConBloqueo/loteMasCpuMasBloqueo.tsk 1 1 0 SchedNoMistery | ./graphsched.py > ej7/ConBloqueo/imgNMMasCpuMasBloqueo1Core.png
+ 1698  ./simusched ej7/ConBloqueo/loteMasCpuMasBloqueo.tsk 2 1 0 SchedNoMistery | ./graphsched.py > ej7/ConBloqueo/imgNMMasCpuMasBloqueo2Core.png
+
