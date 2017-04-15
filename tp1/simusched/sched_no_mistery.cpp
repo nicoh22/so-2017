@@ -46,7 +46,6 @@ void SchedNoMistery::load(int pid) {
 
 void SchedNoMistery::unblock(int pid) 
 {
-	load(pid);
 }
 
 int SchedNoMistery::tick(int cpu, const enum Motivo m) {
@@ -56,7 +55,7 @@ int SchedNoMistery::tick(int cpu, const enum Motivo m) {
 		switch(m)
 		{
 			case BLOCK: 
-				siguiente = IDLE_TASK;
+				siguiente = current_pid(cpu);
 				break;
 			case EXIT:
 				siguiente = IDLE_TASK;
@@ -73,7 +72,7 @@ int SchedNoMistery::tick(int cpu, const enum Motivo m) {
 		switch(m)
 		{
 			case BLOCK:
-				siguiente = nextTask();
+				siguiente = current_pid(cpu);
 				break;
 			case EXIT:
 				siguiente = nextTask();
