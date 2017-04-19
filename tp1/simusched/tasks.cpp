@@ -61,6 +61,15 @@ void TaskPriorizada(int pid, vector<int> params) {
 	return;
 }
 
+void TaskPrioBloqueo(int pid, vector<int> params) {
+	int tiempo_cpu = params[1];
+	int tiempo_bloqueo = params[2];
+
+	uso_CPU(pid, tiempo_cpu);
+	uso_IO(pid, tiempo_bloqueo);
+
+	return;
+}
 void tasks_init(void) {
 	/* Todos los tipos de tareas se deben registrar acá para poder ser usadas.
 	 * El segundo parámetro indica la cantidad de parámetros que recibe la tarea
@@ -71,5 +80,6 @@ void tasks_init(void) {
 	register_task(TaskConsola, 3);
 	register_task(TaskPajarillo, 3);
 	register_task(TaskPriorizada, 2);
+	register_task(TaskPrioBloqueo, 3);
 }
 
