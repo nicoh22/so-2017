@@ -26,7 +26,7 @@ clean:
 new: clean all
 
 ejercicio1: all
-	./$(MAIN) lote.tsk 1 0 5 SchedFCFS | $(GRAPH) > ej1/ej1.png
+	./$(MAIN) ej1/lote.tsk 1 0 5 SchedFCFS | $(GRAPH) > ej1/ej1.png
 
 ejercicio2: all
 	for CORES in 1 2 3 ; do \
