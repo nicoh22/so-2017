@@ -51,5 +51,13 @@ ejercicio5: all
 	done
 
 ejercicio6: all
+	./$(MAIN) ascP-igualCPU.tsk 1 0 0 SchedPSJF | $(GRAPH) > ej6/tests/ascP-igualCPU.png
+	./$(MAIN) desorden-tiemposCambiados.tsk 1 0 0 SchedPSJF | $(GRAPH) > ej6/tests/desorden-tiemposCambiados.png
+	./$(MAIN) dscP-igualCPU.tsk 1 0 0 SchedPSJF | $(GRAPH) > ej6/tests/dscP-igualCPU.png
+	./$(MAIN) igualP-ascCPU.tsk 1 0 0 SchedPSJF | $(GRAPH) > ej6/tests/igualP-ascCPU.png
+	./$(MAIN) igualP-decCPU.tsk 1 0 0 SchedPSJF | $(GRAPH) > ej6/tests/igualP-decCPU.png
+	./$(MAIN) igualP-rndCPU.tsk 1 0 0 SchedPSJF | $(GRAPH) > ej6/tests/igualP-rndCPU.png
+	./$(MAIN) ordenInverso-cpu-prioridad.tsk 1 0 0 SchedPSJF | $(GRAPH) > ej6/tests/ordenInverso-cpu-prioridad.png
+	./$(MAIN) rndP-igualCPU.tsk 1 0 0 SchedPSJF | $(GRAPH) > ej6/tests/rndP-igualCPU.png
 
 ejercicio7: all
