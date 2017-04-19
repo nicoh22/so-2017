@@ -30,7 +30,7 @@ ejercicio1: all
 
 ejercicio2: all
 	for CORES in 1 2 3 ; do \
-		./$(MAIN) ej2/loteFCFS.tsk $$CORES 2 0 SchedFCFS | $(GRAPH) > ej2/$$COREScore.png ; \
+		./$(MAIN) ej2/loteFCFS.tsk $$CORES 2 0 SchedFCFS | $(GRAPH) > ej2/core$$CORES.png ; \
 	done
 
 ejercicio3: all
@@ -46,7 +46,7 @@ ejercicio4: all
 ejercicio5: all
 	for CORES in 1 2 ; do \
 		for LOTE in DistintasMayor DistintasMenor LargaLuegoCortas ; do \
-			./$(MAIN) ej5/$$LOTE.tsk $$CORES 2 0 SchedMistery | $(GRAPH) > ej2/$$COREScores$$LOTE.png ; \
+			./$(MAIN) ej5/$$LOTE.tsk $$CORES 2 0 SchedMistery | $(GRAPH) > ej5/cores$$CORES$$LOTE.png ; \
 		done \
 	done
 
@@ -61,3 +61,29 @@ ejercicio6: all
 	./$(MAIN) rndP-igualCPU.tsk 1 0 0 SchedPSJF | $(GRAPH) > ej6/tests/rndP-igualCPU.png
 
 ejercicio7: all
+	for LOTE in MasCpuLargo MenosCpuLargo ; do \
+		./$(MAIN) ej7/Largo/lote$$LOTE.tsk 1 1 0 SchedNoMistery | $(GRAPH) > ej7/Largo/imgNM1core$$LOTE.png ; \
+		./$(MAIN) ej7/Largo/lote$$LOTE.tsk 2 1 0 SchedNoMistery | $(GRAPH) > ej7/Largo/imgNM2core$$LOTE.png ; \
+		./$(MAIN) ej7/Largo/lote$$LOTE.tsk 1 1 0 SchedRR 1 5 | $(GRAPH) > ej7/Largo/imgRR1core$$LOTE.png ; \
+		./$(MAIN) ej7/Largo/lote$$LOTE.tsk 2 1 0 SchedRR 2 5 5 | $(GRAPH) > ej7/Largo/imgRR2core$$LOTE.png ; \
+	done 
+	for CORES in 1 2 ; do \
+		for LOTE in MasPrioMasCpuLargo MasPrioMenosCpuLargo MenosPrioMasCpuLargo MenosPrioMenosCpuLargo ; do \
+			./$(MAIN) ej7/Largo/lote$$LOTE.tsk $$CORES 1 0 SchedPSJF | $(GRAPH) > ej7/Largo/imgPSJF$$LOTE$$CORES.png ; \
+		done \
+	done 
+	for LOTE in MasCpuMasBloqueo MasCpuMenosBloqueo ; do \
+		./$(MAIN) ej7/ConBloqueo/lote$$LOTE.tsk 1 1 0 SchedNoMistery | $(GRAPH) > ej7/ConBloqueo/imgNM1core$$LOTE.png ; \
+		./$(MAIN) ej7/ConBloqueo/lote$$LOTE.tsk 2 1 0 SchedNoMistery | $(GRAPH) > ej7/ConBloqueo/imgNM2core$$LOTE.png ; \
+		./$(MAIN) ej7/ConBloqueo/lote$$LOTE.tsk 1 1 0 SchedRR 1 5 | $(GRAPH) > ej7/ConBloqueo/imgRR1core$$LOTE.png ; \
+		./$(MAIN) ej7/ConBloqueo/lote$$LOTE.tsk 2 1 0 SchedRR 2 5 5 | $(GRAPH) > ej7/ConBloqueo/imgRR2core$$LOTE.png ; \
+	done 
+	for CORES in 1 2 ; do \
+		for LOTE in MenosPrioMasCpuMasBloqueo MenosPrioMasCpuMenosBloqueo ; do \
+			./$(MAIN) ej7/ConBloqueo/lote$$LOTE.tsk $$CORES 1 0 SchedPSJF | $(GRAPH) > ej7/ConBloqueo/imgPSJF$$LOTE$$CORES.png ; \
+		done \
+	done 
+
+
+
+
