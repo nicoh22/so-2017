@@ -38,10 +38,10 @@ ejercicio3: all
 	./$(MAIN) ej3/lote.tsk 3 2 0 SchedFCFS | $(GRAPH) > ej3/3cpu.png 
 
 ejercicio4: all
-	./$(MAIN) ej4/loteMasCpuMenosBloqueo2.tsk 1 0 0 SchedRR 1 2 | $(GRAPH) > ej4/imgMasCpuMenosBloqueo1002b.png
-	./$(MAIN) ej4/loteMasCpuMenosBloqueo2.tsk 2 0 0 SchedRR 2 2 2 | $(GRAPH) > ej4/imgMasCpuMenosBloqueo2002b.png
-	./$(MAIN) ej4/loteMasCpuMenosBloqueo2.tsk 3 0 0 SchedRR 3 2 2 2 | $(GRAPH) > ej4/imgMasCpuMenosBloqueo3002b.png
-	./$(MAIN) ej4/loteMasCpuMenosBloqueo2.tsk 4 0 0 SchedRR 4 2 2 2 2 | $(GRAPH) > ej4/imgMasCpuMenosBloqueo4002b.png
+	./$(MAIN) ej4/loteSinBloqueo.tsk 1 0 0 SchedRR 1 2 | $(GRAPH) > ej4/imgSinBloqueo.png
+	./$(MAIN) ej4/loteConBloqueo1.tsk 1 0 0 SchedRR 1 2 | $(GRAPH) > ej4/imgConBloqueo1.png
+	./$(MAIN) ej4/loteConBloqueo2.tsk 1 0 0 SchedRR 1 2 | $(GRAPH) > ej4/imgConBloqueo2.png
+	./$(MAIN) ej4/loteQuantumDiff.tsk 2 0 0 SchedRR 2 1 2 | $(GRAPH) > ej4/imgQuantumDiff.png
 
 ejercicio5: all
 	for CORES in 1 2 ; do \
