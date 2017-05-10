@@ -27,7 +27,15 @@ public:
 	}
 
 	void push_front(const T& val) {
-		/* Completar. Debe ser atómico. */
+		Nodo *nuevo = new Nodo(val);
+		nuevo->_next = _head.load();
+		
+		//while por fallos espureos
+		//compara head con nuevo-> next
+		//si falla nuevo->next = head
+		//si exito head = nuevo
+		while(!_head->compare_and_exchange_weak(nuevo->next, nuevo));
+
 	}
 
 	T& front() const {
