@@ -35,7 +35,7 @@ void TaskConsola(int pid, vector<int> params)
 
 	for(int i = 0; i < n; i++)
 	{
-		uso_IO(pid, (rand() % (bmax - bmin)) + bmin);// llamada bloqueante
+		uso_IO(pid, (rand() % (bmax - bmin + 1)) + bmin);// llamada bloqueante
 	}
 	return;//Lo pongo para ilustrar mejor que toma tiempo de cpu
 }
