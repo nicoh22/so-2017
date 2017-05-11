@@ -34,7 +34,7 @@ public:
 		//compara head con nuevo-> next
 		//si falla nuevo->next = head
 		//si exito head = nuevo
-		while(!_head->compare_and_exchange_weak(nuevo->next, nuevo));
+		while(!_head.compare_and_exchange_weak(nuevo->next, nuevo));
 
 	}
 
