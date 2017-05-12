@@ -289,7 +289,7 @@ struct Ext2FSInode * Ext2FS::load_inode(unsigned int inode_number)
 	unsigned int inode_block = table_offset / block_size;
 	read_block(myBlockgroup->inode_table + inode_block, &inodes);
 }
-
+/*
 unsigned int Ext2FS::get_block_address(struct Ext2FSInode * inode, unsigned int block_number)
 {
 
@@ -319,6 +319,63 @@ unsigned int Ext2FS::get_block_address(struct Ext2FSInode * inode, unsigned int 
 		unsigned int snd_table = indirection_blocks[indirect_block_number];
 		read_block(snd_table, &indirection_blocks);
 		return indirection_blocks[index_block];
+	}
+}
+*/
+unsigned int Ext2FS::get_block_address(struct Ext2FSInode * inode, unsigned int block_number)
+{
+	unsigned int block_size = 1024 << _superblock->log_block_size;
+	unsigned int cant_entries = block_size / sizeof(unsigned int);
+	if(block_number < 12)
+	{
+		return inode->blocks[block_number];
+	}
+	else
+	{
+		if(block_number < 12 + cant_entries)
+		{
+			return fetch_from_indirection_table(
+					inode->blocks[12], 
+					block_number - 12, 
+					1);
+		}
+		else if(block_number < 12 + cant_entries + (cant_entries*cant_entries))
+		{
+			return fetch_from_indirection_table(
+					inode->blocks[13],
+					block_number - 12 - cant_entries,
+					cant_entries);
+		}
+		else
+		{
+			return fetch_from_indirection_table(
+					inode->blocks[14],
+					block_number - 12 - cant_entries - (cant_entries*cant_entries),
+					cant_entries*cant_entries);
+		}
+	}
+}
+
+unsigned int Ext2FS::fetch_from_indirection_table(
+		unsigned int table, 
+		unsigned int block_number, 
+		unsigned int blocks_per_entry)
+{
+	//blocks_per_entry es cant_entries^k con 0<=k<=2
+	unsigned int block_size = 1024 << _superblock->log_block_size;
+	unsigned int cant_entries = block_size / sizeof(unsigned int);
+	unsigned int indirection_blocks[cant_entries];
+	read_block(table, &indirection_blocks);
+	if(blocks_per_entry == 1)
+	{
+		return indirection_blocks[block_number];
+	}
+	else
+	{
+		table = indirection_blocks[block_number];
+		block_number = block_number / blocks_per_entry;
+		blocks_per_entry = blocks_per_entry / cant_entries;//cant_entries^(k-1)
+		return fetch_from_indirection_table(table, block_number, blocks_per_entry);
 	}
 }
 
