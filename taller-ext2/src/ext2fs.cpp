@@ -385,7 +385,7 @@ void Ext2FS::read_block(unsigned int block_address, unsigned char * buffer)
 	unsigned int sectors_per_block = block_size / SECTOR_SIZE;
 	for(unsigned int i = 0; i < sectors_per_block; i++)
 		_hdd.read(blockaddr2sector(block_address)+i, buffer+i*SECTOR_SIZE);
-	}
+}
 
 struct Ext2FSInode * Ext2FS::get_file_inode_from_dir_inode(struct Ext2FSInode * from, const char * filename)
 {

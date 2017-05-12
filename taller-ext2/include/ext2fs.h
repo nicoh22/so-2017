@@ -246,6 +246,10 @@ private:
 	struct Ext2FSBlockGroupDescriptor * _bgd_table;
 	unsigned int _block_groups;
 
+	unsigned int fetch_from_indirection_table(
+			unsigned int table, 
+			unsigned int block_number, 
+			unsigned int blocks_per_entry);
 	unsigned int blockgroup_for_inode(unsigned int inode);
 	unsigned int blockgroup_inode_index(unsigned int inode);
 	fd_t get_free_fd();
