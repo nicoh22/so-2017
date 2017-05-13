@@ -1,5 +1,6 @@
 #include <pair>
 #include <string>
+#include "ListaAtomica.hpp"
 
 class ConcurrentHashMap()
 {
@@ -11,4 +12,6 @@ class ConcurrentHashMap()
 		pair<string, unsigned int> maximum(unsigned int nt);
 	private:
 		//TODO
+		Lista< pair<string, unsigned int> > map[26];
+		unsigned int hash(string key);
 }
