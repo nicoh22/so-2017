@@ -373,7 +373,7 @@ unsigned int Ext2FS::fetch_from_indirection_table(
 	else
 	{
    		table = indirection_blocks[block_number / cant_entries];
-		block_number = block_number - (cant_entries * (block_number / cant_entries));
+		block_number = block_number - (blocks_per_entry * (block_number / cant_entries));
 		blocks_per_entry = blocks_per_entry / cant_entries;//cant_entries^(k-1)
 		return fetch_from_indirection_table(table, block_number, blocks_per_entry);
 	}
