@@ -1,4 +1,5 @@
 #include "ConcurrentHashMap.hpp"
+#include <atomic>
 
 
 ConcurrentHashMap::ConcurrentHashMap()
@@ -16,7 +17,8 @@ void ConcurrentHashMap::addAndInc(string key)
 	{
 		if(strncmp(key, it.Siguiente().first ))
 		{
-			break;
+			it.Siguiente()->second.getAndInc();
+			return;
 		}
 		it.Avanzar();
 	}
