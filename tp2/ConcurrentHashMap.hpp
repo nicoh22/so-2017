@@ -2,7 +2,8 @@
 #include <string>
 #include "ListaAtomica.hpp"
 #include <atomic>
-
+#include <pthread>
+typedef pair<string, unsigned int> tupla;
 class ConcurrentHashMap()
 {
 	public:
@@ -10,9 +11,10 @@ class ConcurrentHashMap()
 		~ConcurrentHashMap();
 		void addAndInc(string key);
 		bool member(string key);
-		pair<string, unsigned int> maximum(unsigned int nt);
+		tupla maximum(unsigned int nt);
 	private:
 		//TODO
-		Lista< pair<string, atomic<unsigned int> > > map[26];
+		Lista< tupla > map[26];
+		pthread_mutex_t lock_list[26];
 		unsigned int hash(string key);
 }
