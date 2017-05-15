@@ -6,6 +6,7 @@ using namespace std;
 
 int main(int argc, char **argv) {
 	ConcurrentHashMap h;
+	/*
 	list<string> l = { "corpus-0", "corpus-1", "corpus-2", "corpus-3", "corpus-4" };
 	int i;
 
@@ -20,7 +21,7 @@ int main(int argc, char **argv) {
 			cout << t.first << " " << t.second << endl;
 		}
 	}
-
+*/
 	return 0;
 }
 

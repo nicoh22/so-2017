@@ -135,22 +135,22 @@ tupla ConcurrentHashMap::maximum(unsigned int nt)
 	tupla max = tupla("", 0);
 	for(int i = 0; i < 26; i++)
 	{
-		if(maxtarg.maximums[i] != NULL && maxtarg.maximums[i].second > max.second)
+		if(args.maximums[i] != NULL && args.maximums[i]->second > max.second)
 		{
-			max = maxtarg.maximums[i];
+			max = *args.maximums[i];
 		}
 	}
 	for(int i = 0; i < 26; i++)
 	{
-		pthread_mutex_unlock(lock_list[i]);
-		delete maxtarg.maximums[i];
+		pthread_mutex_unlock(&lock_list[i]);
+		delete args.maximums[i];
 	}
 	//TODO: destruir locks de maxtargs, funcion del struct.
 	return max;
 }
 
 
-unsigned int ConcurrentHashMap::hash(string key)
+unsigned int ConcurrentHashMap::hash(std::string key)
 {
 	return key[0] - 97;
 }
