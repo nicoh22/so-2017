@@ -1,6 +1,5 @@
 #include "ConcurrentHashMap.hpp"
 #include <atomic>
-#include <pthread>
 
 typedef struct max_t{
 
@@ -11,7 +10,7 @@ typedef struct max_t{
 		for(int i = 0; i < 26; i++)
 		{
 			maximums[i] = NULL;
-			pthread_mutex_init(locks[i], NULL);
+			pthread_mutex_init(&locks[i], NULL);
 		}
 	}
 } maxtarg;
@@ -21,7 +20,7 @@ ConcurrentHashMap::ConcurrentHashMap()
 {
 	for(int i = 0; i < 26; i++)
 	{
-		pthread_mutex_init(lock_list[i], NULL);
+		pthread_mutex_init(&lock_list[i], NULL);
 	}
 }
 
@@ -30,36 +29,36 @@ ConcurrentHashMap::~ConcurrentHashMap()
 {
 	for(int i = 0; i < 26; i++)
 	{
-		pthread_mutex_destroy(lock_list[i]);
+		pthread_mutex_destroy(&lock_list[i]);
 	}
 }
 
-void ConcurrentHashMap::addAndInc(string key)
+void ConcurrentHashMap::addAndInc(std::string key)
 {
 	unsigned int index = hash(key);
-	pthread_mutex_lock(lock_list[index]);
-	Lista< tupla >::Iterator it = map[index].CrearIt();
+	pthread_mutex_lock(&lock_list[index]);
+	Lista< tupla >::Iterador it = map[index].CrearIt();
 	while(it.HaySiguiente())
 	{
-		if(strncmp(key, it.Siguiente()->first ))
+		if(key.compare(it.Siguiente().first) == 0)
 		{
-			it.Siguiente()->second++;
+			it.Siguiente().second++;
 			return;
 		}
 		it.Avanzar();
 	}
-	map[index].push_front(key, 1);
-	pthread_mutex_unlock(lock_list[index]);
+	map[index].push_front(make_pair(key, 1));
+	pthread_mutex_unlock(&lock_list[index]);
 }
 
 
-bool ConcurrentHashMap::member(string key)
+bool ConcurrentHashMap::member(std::string key)
 {
 	unsigned int index = hash(key);
-	Lista< pair<string, atomic<unsigned int> > >::Iterator it = map[index].CrearIt();
+	Lista< tupla  >::Iterador it = map[index].CrearIt();
 	while(it.HaySiguiente())
 	{
-		if(strncmp(key, it.Siguiente()->first ))
+		if(key.compare(it.Siguiente().first) == 0)
 		{
 			return true;
 		}
@@ -68,12 +67,12 @@ bool ConcurrentHashMap::member(string key)
 	return false;
 }
 
-void findMaximums(void *args)
+void ConcurrentHashMap::findMaximums(void *args)
 {
-	maxtarg *arg = (maxtargs *) args;
+	maxtarg *arg = (maxtarg *) args;
 	for(int i = 0; i < 26; i++)
 	{
-		if(pthread_mutex_trylock(arg->locks[i]))
+		if(pthread_mutex_trylock(&(arg->locks[i])))
 		{
 			if(arg->maximums[i] == NULL && this->map[i] != NULL)
 			{
