@@ -14,9 +14,9 @@ class ConcurrentHashMap
 		bool member(std::string key);
 		tupla maximum(unsigned int nt);
 	private:
-		//TODO
 		Lista< tupla > map[26];
 		pthread_mutex_t lock_list[26];
 		unsigned int hash(std::string key);
+		static void *maxThread(void *args);
 		void findMaximums(void * args);
 };

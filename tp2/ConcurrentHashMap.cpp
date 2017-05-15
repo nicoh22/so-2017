@@ -1,16 +1,25 @@
 #include "ConcurrentHashMap.hpp"
 #include <atomic>
-
+#include <utility>
 typedef struct max_t{
 
 	tupla *maximums[26];
 	pthread_mutex_t locks[26];
+	ConcurrentHashMap *hashMap;
 	max_t()
 	{
 		for(int i = 0; i < 26; i++)
 		{
 			maximums[i] = NULL;
 			pthread_mutex_init(&locks[i], NULL);
+		}
+	}
+	~max_t()
+	{
+		for(int i = 0; i < 26; i++)
+		{
+		//	maximums[i] = NULL;
+			pthread_mutex_destroy(&locks[i]);
 		}
 	}
 } maxtarg;
@@ -67,6 +76,14 @@ bool ConcurrentHashMap::member(std::string key)
 	return false;
 }
 
+void *ConcurrentHashMap::maxThread(void *args)
+{
+	maxtarg *arg = (maxtarg *) args;
+	ConcurrentHashMap *myMap = arg->hashMap;
+	myMap->findMaximums(args);
+}
+
+
 void ConcurrentHashMap::findMaximums(void *args)
 {
 	maxtarg *arg = (maxtarg *) args;
@@ -74,23 +91,26 @@ void ConcurrentHashMap::findMaximums(void *args)
 	{
 		if(pthread_mutex_trylock(&(arg->locks[i])))
 		{
-			if(arg->maximums[i] == NULL && this->map[i] != NULL)
+			Lista< tupla >::Iterador it = map[i].CrearIt();
+			//esta es la unica forma de saber si ListaAtomica esta vacia
+			if(arg->maximums[i] == NULL && !(it.HaySiguiente()))
 			{
-				Lista< tupla >::Iterator it = map[i].CrearIt();
-				tupla max = tupla("", 0);
+				tupla max = std::make_pair("", 0);
 				while(it.HaySiguiente())
 				{
-					tupla *actual = it.Siguiente();
+					tupla *actual = &it.Siguiente();
 					if (actual->second > max.second) {
 						max = *actual;
 					}
 					it.Avanzar();
 				}
 
-				arg->maximums[i] = new pair(max);
+				arg->maximums[i] = new tupla;
+				arg->maximums[i]->first = max.first;
+				arg->maximums[i]->second = max.second;
 			}
 
-			pthread_mutex_unlock(arg->locks[i]);
+			pthread_mutex_unlock(&arg->locks[i]);
 		}
 	}
 }
@@ -99,14 +119,14 @@ tupla ConcurrentHashMap::maximum(unsigned int nt)
 {
 	for(int i = 0; i < 26; i++)
 	{
-		pthread_mutex_lock(lock_list[i]);
+		pthread_mutex_lock(&lock_list[i]);
 	}
 	pthread_t threads[nt];
 	int tid;
 	maxtarg args;
 	for(tid = 0; tid < nt; tid++)
 	{
-		pthread_create(&threads[tid], NULL, findMaximums, &args);	
+		pthread_create(&threads[tid], NULL, &ConcurrentHashMap::maxThread, (void *)&args);	
 	}
 	for(int i = 0; i < nt; i++)
 	{
@@ -123,6 +143,7 @@ tupla ConcurrentHashMap::maximum(unsigned int nt)
 	for(int i = 0; i < 26; i++)
 	{
 		pthread_mutex_unlock(lock_list[i]);
+		delete maxtarg.maximums[i];
 	}
 	//TODO: destruir locks de maxtargs, funcion del struct.
 	return max;
