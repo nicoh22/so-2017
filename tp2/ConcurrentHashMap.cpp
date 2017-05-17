@@ -1,6 +1,7 @@
 #include "ConcurrentHashMap.hpp"
 #include <atomic>
 #include <utility>
+#include <fstream>
 typedef struct max_t{
 
 	tupla *maximums[26];
@@ -24,6 +25,10 @@ typedef struct max_t{
 	}
 } maxtarg;
 
+typedef struct file_n_map{
+	ConcurrentHashMap *hashMap;
+	std::string *filename;
+} fileNMap;
 
 ConcurrentHashMap::ConcurrentHashMap()
 {
@@ -124,6 +129,7 @@ tupla ConcurrentHashMap::maximum(unsigned int nt)
 	pthread_t threads[nt];
 	int tid;
 	maxtarg args;
+	args->hashMap = this;//Le paso la referencia de mi mismo
 	for(tid = 0; tid < nt; tid++)
 	{
 		pthread_create(&threads[tid], NULL, &ConcurrentHashMap::maxThread, (void *)&args);	
@@ -153,4 +159,58 @@ tupla ConcurrentHashMap::maximum(unsigned int nt)
 unsigned int ConcurrentHashMap::hash(std::string key)
 {
 	return key[0] - 97;
+}
+
+static ConcurrentHashMap count_words(std::string archivo){
+    std::ifstream myfile(archivo);
+    ConcurrentHashMap hashmap = new ConcurrentHashMap();
+    if (myfile.is_open())
+	{
+		std::string word;
+	    while (myfile >> word )
+		{
+			hashmap.push_front(word);
+	    }
+	}
+	myfile.close();
+	return hashmap;
+
+};
+
+void *ConcurrentHashMap::count_words_Thread(void *args)
+{
+	fileNMap *arg = (fileNMap *) args;
+	std::ifstream myfile(arg->filename);
+	if (myfile.is_open())
+	{
+		std::string word;
+	    while (myfile >> word )
+		{
+			arg->hashmap.push_front(word);
+	    }
+	}
+	myfile.close();
+
+}
+
+static ConcurrentHashMap count_words(std::list<string> archivos){
+	ConcurrentHashMap hashmap = new ConcurrentHashMap();
+	std::list<int>::iterator it=archivos.begin();
+	pthread_t threads[archivos.size()];
+	int tid;
+	fileNMap args[archivos.size()];
+	
+	for(tid = 0; tid < nt; tid++)
+	{
+		args[tid]->hashmap = hashmap;
+		args[tid]->filename = *it;
+		it++;
+		pthread_create(&threads[tid], NULL, &ConcurrentHashMap::count_words_Thread, (void *)&args[tid]);	
+	}
+	for(int i = 0; i < nt; i++)
+	{
+		pthread_join(threads[i], NULL);
+	}
+
+	return hashmap;
 }
