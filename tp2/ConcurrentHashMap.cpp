@@ -129,7 +129,7 @@ tupla ConcurrentHashMap::maximum(unsigned int nt)
 	pthread_t threads[nt];
 	int tid;
 	maxtarg args;
-	args->hashMap = this;//Le paso la referencia de mi mismo
+	args.hashMap = this;//Le paso la referencia de mi mismo
 	for(tid = 0; tid < nt; tid++)
 	{
 		pthread_create(&threads[tid], NULL, &ConcurrentHashMap::maxThread, (void *)&args);	
@@ -162,8 +162,11 @@ unsigned int ConcurrentHashMap::hash(std::string key)
 }
 
 static ConcurrentHashMap count_words(std::string archivo){
+	//Hay que devolver un ConcurrentHashMap, no un puntero
+	//O sea que hay que implementar el constructor por copia 
+	//declarar en stack el hash map y devolverlo
     std::ifstream myfile(archivo);
-    ConcurrentHashMap hashmap = new ConcurrentHashMap();
+    ConcurrentHashMap *hashmap = new ConcurrentHashMap();
     if (myfile.is_open())
 	{
 		std::string word;
