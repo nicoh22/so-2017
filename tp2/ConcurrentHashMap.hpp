@@ -24,5 +24,6 @@ class ConcurrentHashMap
 		pthread_mutex_t lock_list[26];
 		unsigned int hash(std::string key);
 		static void *maxThread(void *args);
+		static void *count_words_Thread(void *args);
 		void findMaximums(void * args);
 };

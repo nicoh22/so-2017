@@ -81,7 +81,7 @@ bool ConcurrentHashMap::member(std::string key)
 	return false;
 }
 
-void *ConcurrentHashMap::maxThread(void *args)
+static void *ConcurrentHashMap::maxThread(void *args)
 {
 	maxtarg *arg = (maxtarg *) args;
 	ConcurrentHashMap *myMap = arg->hashMap;
@@ -172,7 +172,7 @@ static ConcurrentHashMap count_words(std::string archivo){
 		std::string word;
 	    while (myfile >> word )
 		{
-			hashmap.push_front(word);
+			hashmap.addAndInc(word);
 	    }
 	}
 	myfile.close();
@@ -180,7 +180,7 @@ static ConcurrentHashMap count_words(std::string archivo){
 
 };
 
-void *ConcurrentHashMap::count_words_Thread(void *args)
+static void *ConcurrentHashMap::count_words_Thread(void *args)
 {
 	fileNMap *arg = (fileNMap *) args;
 	std::ifstream myfile(arg->filename);
@@ -189,7 +189,7 @@ void *ConcurrentHashMap::count_words_Thread(void *args)
 		std::string word;
 	    while (myfile >> word )
 		{
-			arg->hashmap.push_front(word);
+			arg->hashmap.addAndInc(word);
 	    }
 	}
 	myfile.close();
@@ -202,7 +202,8 @@ static ConcurrentHashMap count_words(std::list<string> archivos){
 	pthread_t threads[archivos.size()];
 	int tid;
 	fileNMap args[archivos.size()];
-	
+	int nt = archivos.size();
+
 	for(tid = 0; tid < nt; tid++)
 	{
 		args[tid]->hashmap = hashmap;
