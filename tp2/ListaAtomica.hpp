@@ -2,6 +2,7 @@
 #define LISTA_ATOMICA_H__
 
 #include <atomic>
+#include <queue>
 
 template <typename T>
 class Lista {
@@ -23,6 +24,18 @@ public:
 			t = n;
 			n = n->_next;
 			delete t;
+		}
+	}
+	void append(Lista<T>& other){
+		Lista< T >::Iterador it = other.CrearIt();
+		std::queue<T> q;
+		while(it.HaySiguiente()){
+			q.push(it.Siguiente());
+		}
+
+		while(!q.empty()){
+			this->push_front(q.front());
+			q.pop();
 		}
 	}
 
@@ -76,6 +89,8 @@ public:
 			return _lista._head.load() == otro._lista._head.load() && _nodo_sig == otro._nodo_sig;
 		}
 
+
+
 	private:
 		Lista *_lista;
 
@@ -88,6 +103,8 @@ public:
 	Iterador CrearIt() {
 		return Iterador(this, _head);
 	}
+
+
 };
 
 #endif /* LISTA_ATOMICA_H__ */
