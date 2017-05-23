@@ -26,19 +26,32 @@ public:
 			delete t;
 		}
 	}
-	void append(Lista<T>& other){
-		Lista< T >::Iterador it = other.CrearIt();
-		std::queue<T> q;
-		while(it.HaySiguiente()){
-			q.push(it.Siguiente());
-		}
 
-		while(!q.empty()){
-			this->push_front(q.front());
-			q.pop();
+	Lista(const Lista<T>& other): _head(nullptr) {
+		//Lista< T >::Iterador it = other.CrearIt();
+		
+		Nodo * sig;
+		sig = _head.load();
+		while(sig != nullptr){
+			this->push_front(sig->_val);
+			sig = sig->_next;
 		}
 	}
 
+	Lista<T>& operator=(const Lista<T>& other)
+	{
+		if(this != &other)
+		{
+			Nodo * sig;
+			sig = _head.load();
+			while(sig != nullptr){
+				this->push_front(sig->_val);
+				sig = sig->_next;
+			}
+		}
+		return *this;
+
+	}
 	void push_front(const T& val) {
 		Nodo *nuevo = new Nodo(val);
 		nuevo->_next = _head.load();

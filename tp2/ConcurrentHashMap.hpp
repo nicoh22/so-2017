@@ -1,3 +1,5 @@
+#ifndef CONCURRENT_HASH_MAP_H__
+#define CONCURRENT_HASH_MAP_H__
 #include <utility>
 #include <string>
 #include "ListaAtomica.hpp"
@@ -7,12 +9,12 @@
 //using namespace std; 
 typedef std::pair<std::string, unsigned int> tupla;
 
-pthread_mutex_t count_words_lock = PTHREAD_MUTEX_INITIALIZER;
+//pthread_mutex_t count_words_lock = PTHREAD_MUTEX_INITIALIZER;
 class ConcurrentHashMap
 {
 	public:
 		ConcurrentHashMap();
-		ConcurrentHashMap(ConcurrentHashMap& other);
+		//ConcurrentHashMap(const ConcurrentHashMap& other);
 		~ConcurrentHashMap();
 		void addAndInc(std::string key);
 		bool member(std::string key);
@@ -24,8 +26,8 @@ class ConcurrentHashMap
         //static tupla maximum(unsigned int p_archivos, unsigned int p_maximos, list<string> archs);
         static tupla concurrent_maximum(unsigned int p_archivos, unsigned int p_maximos, std::list<std::string> archs);
 		
+		Lista< tupla > tabla[26];
 	private:
-		Lista< tupla > map[26];
 		pthread_mutex_t lock_list[26];
 
 		unsigned int hash(std::string key);
@@ -33,3 +35,5 @@ class ConcurrentHashMap
 		static void *count_words_Thread(void *args);
 		void findMaximums(void * args);
 };
+
+#endif /* CONCURRENT_HASH_MAP_H__ */

@@ -43,17 +43,20 @@ ConcurrentHashMap::ConcurrentHashMap()
 		pthread_mutex_init(&lock_list[i], NULL);
 	}
 }
-
-ConcurrentHashMap::ConcurrentHashMap(ConcurrentHashMap& other)
+/*
+ConcurrentHashMap::ConcurrentHashMap(const ConcurrentHashMap& other)
 {
 	for (int i = 0; i < 26; ++i)
 	{
-		map[i].append(other.map[i]);
+		Lista< tupla>::Iterador it = other.map[i].CrearIt();
+		while(it.HaySiguiente())
+		{
+			this->
 		pthread_mutex_init(&lock_list[i], NULL);
 	}
 	
 }
-
+*/
 
 ConcurrentHashMap::~ConcurrentHashMap()
 {
@@ -67,7 +70,7 @@ void ConcurrentHashMap::addAndInc(std::string key)
 {
 	unsigned int index = hash(key);
 	pthread_mutex_lock(&lock_list[index]);
-	Lista< tupla >::Iterador it = map[index].CrearIt();
+	Lista< tupla >::Iterador it = tabla[index].CrearIt();
 	while(it.HaySiguiente())
 	{
 		if(key.compare(it.Siguiente().first) == 0)
@@ -77,7 +80,7 @@ void ConcurrentHashMap::addAndInc(std::string key)
 		}
 		it.Avanzar();
 	}
-	map[index].push_front(make_pair(key, 1));
+	tabla[index].push_front(make_pair(key, 1));
 	pthread_mutex_unlock(&lock_list[index]);
 }
 
@@ -85,7 +88,7 @@ void ConcurrentHashMap::addAndInc(std::string key)
 bool ConcurrentHashMap::member(std::string key)
 {
 	unsigned int index = hash(key);
-	Lista< tupla  >::Iterador it = map[index].CrearIt();
+	Lista< tupla  >::Iterador it = tabla[index].CrearIt();
 	while(it.HaySiguiente())
 	{
 		if(key.compare(it.Siguiente().first) == 0)
@@ -112,7 +115,7 @@ void ConcurrentHashMap::findMaximums(void *args)
 	{
 		if(pthread_mutex_trylock(&(arg->locks[i])))
 		{
-			Lista< tupla >::Iterador it = map[i].CrearIt();
+			Lista< tupla >::Iterador it = tabla[i].CrearIt();
 			//esta es la unica forma de saber si ListaAtomica esta vacia:
 			//Se calcula solo si no fue calculado antes (maximus[i]==NULL) y nadie lo esta analizando (lock)
 			if(arg->maximums[i] == NULL && !(it.HaySiguiente()))
@@ -182,7 +185,7 @@ static ConcurrentHashMap count_words(std::string archivo){
 	//Hay que devolver un ConcurrentHashMap, no un puntero
 	//O sea que hay que implementar el constructor por copia 
 	//declarar en stack el hash map y devolverlo
-	pthread_mutex_lock(&count_words_lock);
+	//pthread_mutex_lock(&count_words_lock);
     std::ifstream myfile(archivo);
     ConcurrentHashMap hashmap;
     if (myfile.is_open())
@@ -194,7 +197,7 @@ static ConcurrentHashMap count_words(std::string archivo){
 	    }
 	}
 	myfile.close();
-	pthread_mutex_unlock(&count_words_lock);
+	//pthread_mutex_unlock(&count_words_lock);
 	return hashmap;
 
 };
