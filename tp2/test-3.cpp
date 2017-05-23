@@ -15,7 +15,7 @@ int main(int argc, char **argv) {
 	}
 	h = ConcurrentHashMap::count_words(atoi(argv[1]), l);
 	for (i = 0; i < 26; i++) {
-		for (auto it = h.tabla[i]->CrearIt(); it.HaySiguiente(); it.Avanzar()) {
+		for (auto it = h.tabla[i].CrearIt(); it.HaySiguiente(); it.Avanzar()) {
 			auto t = it.Siguiente();
 			cout << t.first << " " << t.second << endl;
 		}

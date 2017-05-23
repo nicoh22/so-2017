@@ -33,6 +33,7 @@ class ConcurrentHashMap
 		unsigned int hash(std::string key);
 		static void *maxThread(void *args);
 		static void *count_words_Thread(void *args);
+		static void *process_files_Thread(void *args);
 		void findMaximums(void * args);
 };
 

@@ -181,7 +181,7 @@ unsigned int ConcurrentHashMap::hash(std::string key)
 	return key[0] - 97;
 }
 
-static ConcurrentHashMap count_words(std::string archivo){
+ConcurrentHashMap ConcurrentHashMap::count_words(std::string archivo){
 	//Hay que devolver un ConcurrentHashMap, no un puntero
 	//O sea que hay que implementar el constructor por copia 
 	//declarar en stack el hash map y devolverlo
@@ -202,7 +202,7 @@ static ConcurrentHashMap count_words(std::string archivo){
 
 };
 
-static void * count_words_Thread(void *args)
+void * ConcurrentHashMap::count_words_Thread(void *args)
 {
 	fileNMap *arg = (fileNMap *) args;
 	std::ifstream myfile(*arg->filename);
@@ -218,7 +218,7 @@ static void * count_words_Thread(void *args)
 
 }
 
-static ConcurrentHashMap count_words(std::list<std::string> archivos){
+ConcurrentHashMap ConcurrentHashMap::count_words(std::list<std::string> archivos){
 	ConcurrentHashMap  hashmap;
 	std::list<std::string>::iterator it=archivos.begin();
 	pthread_t threads[archivos.size()];
@@ -241,7 +241,7 @@ static ConcurrentHashMap count_words(std::list<std::string> archivos){
 	return hashmap;
 }
 
-static void * process_files_Thread(void *args)
+void * ConcurrentHashMap::process_files_Thread(void *args)
 {
 	lockNFileNMap *arg = (lockNFileNMap *) args;
 	for (int l = 0; l < arg->file_names->size(); l++)
@@ -263,7 +263,7 @@ static void * process_files_Thread(void *args)
 
 }
 
- static ConcurrentHashMap count_words(unsigned int n,std::list<std::string> archivos){
+ConcurrentHashMap ConcurrentHashMap::count_words(unsigned int n,std::list<std::string> archivos){
 	ConcurrentHashMap  hashmap;
 	pthread_t threads[archivos.size()];
 	pthread_mutex_t file_lock_list[archivos.size()];
@@ -293,8 +293,7 @@ static void * process_files_Thread(void *args)
 	return hashmap;
 }
 
-static tupla concurrent_maximum(unsigned int p_archivos, unsigned int p_maximos, std::list<std::string> archs){
+tupla ConcurrentHashMap::concurrent_maximum(unsigned int p_archivos, unsigned int p_maximos, std::list<std::string> archs){
 	ConcurrentHashMap  hashmap = count_words(p_archivos, archs);
 	return hashmap.maximum(p_maximos);
-
 }
