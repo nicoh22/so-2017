@@ -31,6 +31,10 @@ typedef struct file_n_map{
 } fileNMap;
 
 typedef struct lock_n_file_n_map{
+	lock_n_file_n_map()
+	{
+		hashmap = nullptr;
+	}
 	ConcurrentHashMap *hashmap;
 	pthread_mutex_t * file_locks;
 	std::list<std::string> * file_names;
@@ -291,6 +295,76 @@ ConcurrentHashMap ConcurrentHashMap::count_words(unsigned int n,std::list<std::s
 	}
 
 	return hashmap;
+}
+
+void * ConcurrentHashMap::readFilesThread(void *args)
+{
+	lockNFileNMap *arg = (lockNFileNMap *)args;
+
+	
+	for (int l = 0; l < arg->file_names->size(); l++)
+	{		
+		if(pthread_mutex_trylock(&(arg->file_locks[l])))
+		{
+			fileNMap args2;
+			args2.hashmap = arg->hashmap;
+
+			//Me posiciono en el l-esimo elemento de la lista
+			std::list<std::string>::iterator it=arg->file_names->begin();
+			int lfin = 0;
+			while(lfin<l){it++;}
+			args->hashmap = count_words(*it);
+		}
+	}
+
+}
+tupla ConcurrentHashMap::maximums_sin_concurrencia(unsigned int p_archivos, unsigned int p_maximos, std::list<std::string> archs)
+{
+	pthread_t threads[p_archivos];
+	int tid;
+	pthread_mutex_t file_lock_list[archs.size()];
+	lockNFileNMap args[archs.size()];
+	for(int i = 0; i < archivos.size(); i++)
+	{
+		pthread_mutex_init(&file_lock_list[i], NULL);
+	}
+	for(tid = 0; tid < p_archivos; tid++)
+	{
+		args[tid].hashmap = &hashmap;
+		args[tid].file_names = &archivos;
+		args[tid].file_locks = file_lock_list;
+		pthread_create(&threads[tid], NULL, readFileThread, (void *)&args[tid]);	
+	}
+
+	for(int i = 0; i < p_archivos; i++)
+	{
+		pthread_join(threads[i], NULL);
+	}
+	//en args[tid].hashmap estan los mapas generados
+	ConcurrentHashMap total;
+	for(int j = 0; j < archs.size(); j++)
+	{
+		//TODO: merge
+		ConcurrentHashMap actual = args[j]->hashmap;
+		for(int t = 0; t < 26; t++)
+		{
+			Lista<tupla>::Iterador it = actual.tabla[t].CrearIt();
+			while(it.HaySiguiente())
+			{
+				tupla tup = it.Siguiente();
+				int cant = tup.second;
+				std::string key = tup.first;
+				for(int i = 0; i < cant; i++)
+				{
+					total.addAndInc(key);
+				}
+				it.Avanzar();
+			}
+		}
+	}
+	//mergeado
+	
+	return total.maximum(p_maximos);
 }
 
 tupla ConcurrentHashMap::concurrent_maximum(unsigned int p_archivos, unsigned int p_maximos, std::list<std::string> archs){
