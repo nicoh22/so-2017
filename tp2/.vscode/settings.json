@@ -1,5 +1,7 @@
 {
     "files.associations": {
-        "atomic": "cpp"
+        "atomic": "cpp",
+        "initializer_list": "cpp",
+        "utility": "cpp"
     }
 }

@@ -306,17 +306,18 @@ void * ConcurrentHashMap::readFilesThread(void *args)
 	{		
 		if(pthread_mutex_trylock(&(arg->file_locks[l])))
 		{
-			fileNMap args2;
-			args2.hashmap = arg->hashmap;
+			// No entiendo las siguientes sentencias...ademas el metodo es estatico (1)
+			//fileNMap args2;
+			//args2.hashmap = arg->hashmap;
 
 			//Me posiciono en el l-esimo elemento de la lista
 			std::list<std::string>::iterator it=arg->file_names->begin();
 			int lfin = 0;
 			while(lfin<l){it++;}
-			args->hashmap = count_words(*it);
+			// Paja tener que copiar algo que se devuelve por copia. No puedo tomar el puntero a la copia devuelta ya que es temporal.
+			arg->hashmap = new ConcurrentHashMap(count_words(*it));
 		}
 	}
-
 }
 tupla ConcurrentHashMap::maximums_sin_concurrencia(unsigned int p_archivos, unsigned int p_maximos, std::list<std::string> archs)
 {
@@ -324,16 +325,19 @@ tupla ConcurrentHashMap::maximums_sin_concurrencia(unsigned int p_archivos, unsi
 	int tid;
 	pthread_mutex_t file_lock_list[archs.size()];
 	lockNFileNMap args[archs.size()];
-	for(int i = 0; i < archivos.size(); i++)
+	for(int i = 0; i < archs.size(); i++)
 	{
 		pthread_mutex_init(&file_lock_list[i], NULL);
 	}
 	for(tid = 0; tid < p_archivos; tid++)
 	{
-		args[tid].hashmap = &hashmap;
-		args[tid].file_names = &archivos;
+
+		// No entiendo la siguiente sentencia...ademas el metodo es estatico (2)
+		//args[tid].hashmap = &hashmap;
+		args[tid].hashmap = NULL;
+		args[tid].file_names = &archs;
 		args[tid].file_locks = file_lock_list;
-		pthread_create(&threads[tid], NULL, readFileThread, (void *)&args[tid]);	
+		pthread_create(&threads[tid], NULL, readFilesThread, (void *)&args[tid]);	
 	}
 
 	for(int i = 0; i < p_archivos; i++)
@@ -345,10 +349,10 @@ tupla ConcurrentHashMap::maximums_sin_concurrencia(unsigned int p_archivos, unsi
 	for(int j = 0; j < archs.size(); j++)
 	{
 		//TODO: merge
-		ConcurrentHashMap actual = args[j]->hashmap;
+		ConcurrentHashMap *actual = args[j].hashmap;
 		for(int t = 0; t < 26; t++)
 		{
-			Lista<tupla>::Iterador it = actual.tabla[t].CrearIt();
+			Lista<tupla>::Iterador it = actual->tabla[t].CrearIt();
 			while(it.HaySiguiente())
 			{
 				tupla tup = it.Siguiente();

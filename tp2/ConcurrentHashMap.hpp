@@ -23,7 +23,7 @@ class ConcurrentHashMap
 		static ConcurrentHashMap count_words(std::string archivo);
 		static ConcurrentHashMap count_words(std::list<std::string> archivo);
         static ConcurrentHashMap count_words(unsigned int n,std::list<std::string> archivos);
-        //static tupla maximum(unsigned int p_archivos, unsigned int p_maximos, list<string> archs);
+		static tupla maximums_sin_concurrencia(unsigned int p_archivos, unsigned int p_maximos, std::list<std::string> archs);
         static tupla concurrent_maximum(unsigned int p_archivos, unsigned int p_maximos, std::list<std::string> archs);
 		
 		Lista< tupla > tabla[26];
@@ -34,6 +34,7 @@ class ConcurrentHashMap
 		static void *maxThread(void *args);
 		static void *count_words_Thread(void *args);
 		static void *process_files_Thread(void *args);
+		static void *readFilesThread(void *args);
 		void findMaximums(void * args);
 };
 
