@@ -31,7 +31,7 @@ public:
 		//Lista< T >::Iterador it = other.CrearIt();
 		
 		Nodo * sig;
-		sig = _head.load();
+		sig = other._head.load();
 		while(sig != nullptr){
 			this->push_front(sig->_val);
 			sig = sig->_next;
@@ -43,7 +43,7 @@ public:
 		if(this != &other)
 		{
 			Nodo * sig;
-			sig = _head.load();
+			sig = other._head.load();
 			while(sig != nullptr){
 				this->push_front(sig->_val);
 				sig = sig->_next;
