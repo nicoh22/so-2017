@@ -285,10 +285,10 @@ void * ConcurrentHashMap::process_files_Thread(void *args)
 
 ConcurrentHashMap ConcurrentHashMap::count_words(unsigned int n,std::list<std::string> archivos){
 	ConcurrentHashMap  hashmap;
-	pthread_t threads[archivos.size()];
+	pthread_t threads[n];
 	pthread_mutex_t file_lock_list[archivos.size()];
 	int tid;
-	lockNFileNMap args[archivos.size()];
+	lockNFileNMap args[n];
 
 	//Inicializo los locks de files
 	for(int i = 0; i < archivos.size(); i++)
@@ -310,6 +310,10 @@ ConcurrentHashMap ConcurrentHashMap::count_words(unsigned int n,std::list<std::s
 		pthread_join(threads[i], NULL);
 	}
 
+	for(int i = 0; i < archivos.size(); i++)
+	{
+		pthread_mutex_destroy(&file_lock_list[i]);
+	}
 	return hashmap;
 }
 
