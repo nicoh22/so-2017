@@ -129,7 +129,7 @@ void ConcurrentHashMap::findMaximums(void *args)
 	maxtarg *arg = (maxtarg *) args;
 	for(int i = 0; i < 26; i++)
 	{
-		if(pthread_mutex_trylock(&(arg->locks[i])))
+		if(pthread_mutex_trylock(&(arg->locks[i])) == 0)
 		{
 			Lista< tupla >::Iterador it = tabla[i].CrearIt();
 			//esta es la unica forma de saber si ListaAtomica esta vacia:
@@ -266,7 +266,7 @@ void * ConcurrentHashMap::process_files_Thread(void *args)
 	lockNFileNMap *arg = (lockNFileNMap *) args;
 	for (int l = 0; l < arg->file_names->size(); l++)
 	{
-		if(pthread_mutex_trylock(&(arg->file_locks[l]))){
+		if(pthread_mutex_trylock(&(arg->file_locks[l])) == 0){
 			fileNMap args2;
 			args2.hashmap = arg->hashmap;
 
@@ -324,7 +324,7 @@ void * ConcurrentHashMap::readFilesThread(void *args)
 	
 	for (int l = 0; l < arg->file_names->size(); l++)
 	{		
-		if(pthread_mutex_trylock(&(arg->file_locks[l])))
+		if(pthread_mutex_trylock(&(arg->file_locks[l])) == 0)
 		{
 			// No entiendo las siguientes sentencias...ademas el metodo es estatico (1)
 			//fileNMap args2;
