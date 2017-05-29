@@ -129,14 +129,14 @@ void ConcurrentHashMap::findMaximums(void *args)
 				int c = 0;
 				while(it.HaySiguiente())
 				{
-					c++;
+					
 					tupla *actual = &it.Siguiente();
 					if (actual->second > max.second) {
 						max = *actual;
 					}
 					it.Avanzar();
 				}
-				printf("%d\n", c );
+				//printf("Hola %d\n", max.first );
 
 				arg->maximums[i] = new tupla;
 				arg->maximums[i]->first = max.first;
