@@ -2,6 +2,7 @@
 #include <atomic>
 #include <utility>
 #include <fstream>
+#include <atomic>
 typedef struct max_t{
 
 	tupla *maximums[26];
@@ -38,6 +39,7 @@ typedef struct lock_n_file_n_map{
 	ConcurrentHashMap *hashmap;
 	pthread_mutex_t * file_locks;
 	std::list<std::string> * file_names;
+	std::atomic_bool *procesado;
 } lockNFileNMap;
 
 ConcurrentHashMap::ConcurrentHashMap()
@@ -266,18 +268,25 @@ void * ConcurrentHashMap::process_files_Thread(void *args)
 	lockNFileNMap *arg = (lockNFileNMap *) args;
 	for (int l = 0; l < arg->file_names->size(); l++)
 	{
-		if(pthread_mutex_trylock(&(arg->file_locks[l])) == 0){
-			fileNMap args2;
-			args2.hashmap = arg->hashmap;
+		if(pthread_mutex_trylock(&(arg->file_locks[l])) == 0)
+		{
+			if(!(arg->procesado[l].load()))
+			{
 
-			//Me posiciono en el l-esimo elemento de la lista
-			std::list<std::string>::iterator it=arg->file_names->begin();
-			
-			int lfin = 0;
-			while(lfin<l){it++;}
+				fileNMap args2;
+				args2.hashmap = arg->hashmap;
 
- 			args2.filename = &(*it);//si tu viejo es zapaterooo...:P
-			count_words_Thread(&args2);
+				//Me posiciono en el l-esimo elemento de la lista
+				std::list<std::string>::iterator it=arg->file_names->begin();
+				
+				int lfin = 0;
+				while(lfin<l){it++; lfin++;}
+
+				args2.filename = &(*it);//si tu viejo es zapaterooo...:P
+				count_words_Thread(&args2);
+				arg->procesado[l].store(true);
+			}
+			pthread_mutex_unlock(&arg->file_locks[l]);
 		}
 	}
 
@@ -287,6 +296,8 @@ ConcurrentHashMap ConcurrentHashMap::count_words(unsigned int n,std::list<std::s
 	ConcurrentHashMap  hashmap;
 	pthread_t threads[n];
 	pthread_mutex_t file_lock_list[archivos.size()];
+	std::atomic_bool procesado[archivos.size()];
+
 	int tid;
 	lockNFileNMap args[n];
 
@@ -294,6 +305,7 @@ ConcurrentHashMap ConcurrentHashMap::count_words(unsigned int n,std::list<std::s
 	for(int i = 0; i < archivos.size(); i++)
 	{
 		pthread_mutex_init(&file_lock_list[i], NULL);
+		std::atomic_init(&procesado[i], false);
 	}
 
 	//Asigno trabajo a los threads
@@ -302,6 +314,7 @@ ConcurrentHashMap ConcurrentHashMap::count_words(unsigned int n,std::list<std::s
 		args[tid].hashmap = &hashmap;
 		args[tid].file_names = &archivos;
 		args[tid].file_locks = file_lock_list;
+		args[tid].procesado = procesado;
 		pthread_create(&threads[tid], NULL, process_files_Thread, (void *)&args[tid]);	
 	}
 
