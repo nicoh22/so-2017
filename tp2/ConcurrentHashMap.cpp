@@ -2,7 +2,6 @@
 #include <atomic>
 #include <utility>
 #include <fstream>
-#include <atomic>
 typedef struct max_t{
 
 	tupla *maximums[26];
@@ -39,7 +38,6 @@ typedef struct lock_n_file_n_map{
 	ConcurrentHashMap *hashmap;
 	pthread_mutex_t * file_locks;
 	std::list<std::string> * file_names;
-	std::atomic_bool *procesado;
 } lockNFileNMap;
 
 ConcurrentHashMap::ConcurrentHashMap()
@@ -54,19 +52,10 @@ ConcurrentHashMap::ConcurrentHashMap(const ConcurrentHashMap& other)
 {
 	for (int i = 0; i < 26; ++i)
 	{
-		Lista< tupla>::Iterador it = other.tabla[i].CrearIt();
+		Lista< tupla>::Iterador it = other.map[i].CrearIt();
 		while(it.HaySiguiente())
 		{
-				tupla tup = it.Siguiente();
-			
-				std::string key = tup.first;
-				for(int i = 0; i < tup.second; i++)
-				{
-					this->addAndInc(key);
-				}
-				it.Avanzar();
-			
-		}
+			this->
 		pthread_mutex_init(&lock_list[i], NULL);
 	}
 	
@@ -84,7 +73,6 @@ ConcurrentHashMap::~ConcurrentHashMap()
 void ConcurrentHashMap::addAndInc(std::string key)
 {
 	unsigned int index = hash(key);
-
 	pthread_mutex_lock(&lock_list[index]);
 	Lista< tupla >::Iterador it = tabla[index].CrearIt();
 	while(it.HaySiguiente())
@@ -92,12 +80,10 @@ void ConcurrentHashMap::addAndInc(std::string key)
 		if(key.compare(it.Siguiente().first) == 0)
 		{
 			it.Siguiente().second++;
-			pthread_mutex_unlock(&lock_list[index]);
 			return;
 		}
 		it.Avanzar();
 	}
-
 	tabla[index].push_front(make_pair(key, 1));
 	pthread_mutex_unlock(&lock_list[index]);
 }
@@ -131,7 +117,7 @@ void ConcurrentHashMap::findMaximums(void *args)
 	maxtarg *arg = (maxtarg *) args;
 	for(int i = 0; i < 26; i++)
 	{
-		if(pthread_mutex_trylock(&(arg->locks[i])) == 0)
+		if(pthread_mutex_trylock(&(arg->locks[i])))
 		{
 			Lista< tupla >::Iterador it = tabla[i].CrearIt();
 			//esta es la unica forma de saber si ListaAtomica esta vacia:
@@ -204,9 +190,6 @@ ConcurrentHashMap ConcurrentHashMap::count_words(std::string archivo){
 	//O sea que hay que implementar el constructor por copia 
 	//declarar en stack el hash map y devolverlo
 	//pthread_mutex_lock(&count_words_lock);
-
-
-
     std::ifstream myfile(archivo);
     ConcurrentHashMap hashmap;
     if (myfile.is_open())
@@ -214,9 +197,7 @@ ConcurrentHashMap ConcurrentHashMap::count_words(std::string archivo){
 		std::string word;
 	    while (myfile >> word )
 		{
-			
 			hashmap.addAndInc(word);
-			
 	    }
 	}
 	myfile.close();
@@ -260,6 +241,7 @@ ConcurrentHashMap ConcurrentHashMap::count_words(std::list<std::string> archivos
 	{
 		pthread_join(threads[i], NULL);
 	}
+
 	return hashmap;
 }
 
@@ -268,25 +250,18 @@ void * ConcurrentHashMap::process_files_Thread(void *args)
 	lockNFileNMap *arg = (lockNFileNMap *) args;
 	for (int l = 0; l < arg->file_names->size(); l++)
 	{
-		if(pthread_mutex_trylock(&(arg->file_locks[l])) == 0)
-		{
-			if(!(arg->procesado[l].load()))
-			{
+		if(pthread_mutex_trylock(&(arg->file_locks[l]))){
+			fileNMap args2;
+			args2.hashmap = arg->hashmap;
 
-				fileNMap args2;
-				args2.hashmap = arg->hashmap;
+			//Me posiciono en el l-esimo elemento de la lista
+			std::list<std::string>::iterator it=arg->file_names->begin();
+			
+			int lfin = 0;
+			while(lfin<l){it++;lfin++;}
 
-				//Me posiciono en el l-esimo elemento de la lista
-				std::list<std::string>::iterator it=arg->file_names->begin();
-				
-				int lfin = 0;
-				while(lfin<l){it++; lfin++;}
-
-				args2.filename = &(*it);//si tu viejo es zapaterooo...:P
-				count_words_Thread(&args2);
-				arg->procesado[l].store(true);
-			}
-			pthread_mutex_unlock(&arg->file_locks[l]);
+ 			args2.filename = &(*it);//si tu viejo es zapaterooo...:P
+			count_words_Thread(&args2);
 		}
 	}
 
@@ -294,18 +269,15 @@ void * ConcurrentHashMap::process_files_Thread(void *args)
 
 ConcurrentHashMap ConcurrentHashMap::count_words(unsigned int n,std::list<std::string> archivos){
 	ConcurrentHashMap  hashmap;
-	pthread_t threads[n];
+	pthread_t threads[archivos.size()];
 	pthread_mutex_t file_lock_list[archivos.size()];
-	std::atomic_bool procesado[archivos.size()];
-
 	int tid;
-	lockNFileNMap args[n];
+	lockNFileNMap args[archivos.size()];
 
 	//Inicializo los locks de files
 	for(int i = 0; i < archivos.size(); i++)
 	{
 		pthread_mutex_init(&file_lock_list[i], NULL);
-		std::atomic_init(&procesado[i], false);
 	}
 
 	//Asigno trabajo a los threads
@@ -314,7 +286,6 @@ ConcurrentHashMap ConcurrentHashMap::count_words(unsigned int n,std::list<std::s
 		args[tid].hashmap = &hashmap;
 		args[tid].file_names = &archivos;
 		args[tid].file_locks = file_lock_list;
-		args[tid].procesado = procesado;
 		pthread_create(&threads[tid], NULL, process_files_Thread, (void *)&args[tid]);	
 	}
 
@@ -323,10 +294,6 @@ ConcurrentHashMap ConcurrentHashMap::count_words(unsigned int n,std::list<std::s
 		pthread_join(threads[i], NULL);
 	}
 
-	for(int i = 0; i < archivos.size(); i++)
-	{
-		pthread_mutex_destroy(&file_lock_list[i]);
-	}
 	return hashmap;
 }
 
@@ -337,7 +304,7 @@ void * ConcurrentHashMap::readFilesThread(void *args)
 	
 	for (int l = 0; l < arg->file_names->size(); l++)
 	{		
-		if(pthread_mutex_trylock(&(arg->file_locks[l])) == 0)
+		if(pthread_mutex_trylock(&(arg->file_locks[l])))
 		{
 			// No entiendo las siguientes sentencias...ademas el metodo es estatico (1)
 			//fileNMap args2;
