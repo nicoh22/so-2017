@@ -41,3 +41,4 @@ int main(int argc, char **argv) {
 	cout<<diff(maxcstart,maxcend).tv_sec<<":"<<diff(maxcstart,maxcend).tv_nsec<<endl;
 	cout<<diff(maxncstart,maxncend).tv_sec<<":"<<diff(maxncstart,maxncend).tv_nsec<<endl;
 	return 0;
+}
