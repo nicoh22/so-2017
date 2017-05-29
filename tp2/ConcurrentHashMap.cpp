@@ -300,7 +300,7 @@ ConcurrentHashMap ConcurrentHashMap::count_words(unsigned int n,std::list<std::s
 
 	for(int i = 0; i < archivos.size(); i++)
 	{
-		pthread_mutex_destroy(&file_lock_list[i], NULL);
+		pthread_mutex_destroy(&file_lock_list[i]);
 	}
 	return hashmap;
 }
