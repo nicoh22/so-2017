@@ -333,6 +333,7 @@ tupla ConcurrentHashMap::maximums_sin_concurrencia(unsigned int p_archivos, unsi
 	int tid;
 	pthread_mutex_t file_lock_list[archs.size()];
 	lockNFileNMap args[archs.size()];
+	//Creo tantas estructuras como archivos
 	for(int i = 0; i < archs.size(); i++)
 	{
 		pthread_mutex_init(&file_lock_list[i], NULL);
@@ -340,14 +341,14 @@ tupla ConcurrentHashMap::maximums_sin_concurrencia(unsigned int p_archivos, unsi
 		args[i].file_names = &archs;
 		args[i].file_locks = file_lock_list;
 	}
+	
+	//Creo los threads
 	for(tid = 0; tid < p_archivos; tid++)
 	{
 
-		// No entiendo la siguiente sentencia...ademas el metodo es estatico (2)
-		//args[tid].hashmap = &hashmap;
 		pthread_create(&threads[tid], NULL, readFilesThread, (void *)&args);	
 	}
-
+	//Espero su finalizacion
 	for(int i = 0; i < p_archivos; i++)
 	{
 		pthread_join(threads[i], NULL);
@@ -373,6 +374,7 @@ tupla ConcurrentHashMap::maximums_sin_concurrencia(unsigned int p_archivos, unsi
 				it.Avanzar();
 			}
 		}
+		delete args[j].hashmap;
 	}
 	//mergeado
 	
