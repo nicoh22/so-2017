@@ -4,7 +4,7 @@
 
 CXX = g++
 CXXFLAGS = -g -std=c++11
-LDLIBS = -lpthread
+LDLIBS = -lrt -lpthread
 
 .cpp.o:
 	$(CXX) $(CXXFLAGS) -c $<
@@ -71,6 +71,18 @@ test-6-run: test-6
 	for i in 0 1 2 3 4; do sed -n "$$((i * 500 + 1)),$$(((i + 1) * 500))p" corpus >corpus-"$$i"; done
 	for i in 0 1 2 3 4; do for j in 0 1 2 3 4; do \
 		./test-6 $$((i + 1)) $$((j + 1)) | diff -u - corpus-max; \
+	done; done
+	rm -f corpus-max corpus-[0-4]
+
+test-maximums: test-maximums.cpp
+	$(CXX) $(CXXFLAGS) $(LDFLAGS) -o $@ test-maximums.cpp $(OBJ) $(LDLIBS)
+
+test-maximums-run: test-maximums
+	awk -f corpus.awk corpus | sort -nk 2 | tail -n 1 >corpus-max
+	cat corpus-max
+	for i in 0 1 2 3 4; do sed -n "$$((i * 500 + 1)),$$(((i + 1) * 500))p" corpus >corpus-"$$i"; done
+	for i in 0 1 2 3 4; do for j in 0 1 2 3 4; do \
+		./test-maximums $$((i + 1)) $$((j + 1)) | diff -u - corpus-max; \
 	done; done
 	rm -f corpus-max corpus-[0-4]
 clean:
