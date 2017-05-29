@@ -9,10 +9,20 @@ LDLIBS = -lpthread
 .cpp.o:
 	$(CXX) $(CXXFLAGS) -c $<
 
-BIN = test-2 test-3 test-4 test-5 test-6
+BIN = test-1 test-2 test-3 test-4 test-5 test-6
 OBJ = ConcurrentHashMap.o
 
 all: $(BIN)
+
+test-1: $(OBJ) test-1.cpp
+	$(CXX) $(CXXFLAGS) $(LDFLAGS) -o $@ test-1.cpp $(OBJ) $(LDLIBS)
+	
+test-1-run: test-1
+	cat corpus | sort >corpus-post
+	for i in 0 1 2 3 4; do sed -n "$$((i * 500 + 1)),$$(((i + 1) * 500))p" corpus >corpus-"$$i"; done
+	for i in 0 1 2 3 4; do ./test-1 $$((i + 1)) | sort | diff -u - corpus-post; done
+	rm -f corpus-post corpus-[0-4]
+
 
 test-2: $(OBJ) test-2.cpp
 	$(CXX) $(CXXFLAGS) $(LDFLAGS) -o $@ test-2.cpp $(OBJ) $(LDLIBS)
