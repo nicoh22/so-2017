@@ -118,22 +118,25 @@ void ConcurrentHashMap::findMaximums(void *args)
 	maxtarg *arg = (maxtarg *) args;
 	for(int i = 0; i < 26; i++)
 	{
-		if(pthread_mutex_trylock(&(arg->locks[i])))
+		if(pthread_mutex_trylock(&(arg->locks[i]))==0)
 		{
 			Lista< tupla >::Iterador it = tabla[i].CrearIt();
 			//esta es la unica forma de saber si ListaAtomica esta vacia:
 			//Se calcula solo si no fue calculado antes (maximus[i]==NULL) y nadie lo esta analizando (lock)
-			if(arg->maximums[i] == NULL && !(it.HaySiguiente()))
+			if(arg->maximums[i] == NULL && it.HaySiguiente())
 			{
 				tupla max = std::make_pair("", 0);
+				int c = 0;
 				while(it.HaySiguiente())
 				{
+					c++;
 					tupla *actual = &it.Siguiente();
 					if (actual->second > max.second) {
 						max = *actual;
 					}
 					it.Avanzar();
 				}
+				printf("%d\n", c );
 
 				arg->maximums[i] = new tupla;
 				arg->maximums[i]->first = max.first;
@@ -251,7 +254,7 @@ void * ConcurrentHashMap::process_files_Thread(void *args)
 	lockNFileNMap *arg = (lockNFileNMap *) args;
 	for (int l = 0; l < arg->file_names->size(); l++)
 	{
-		if(pthread_mutex_trylock(&(arg->file_locks[l]))){
+		if(pthread_mutex_trylock(&(arg->file_locks[l]))==0){
 			fileNMap args2;
 			args2.hashmap = arg->hashmap;
 
@@ -314,7 +317,7 @@ void * ConcurrentHashMap::readFilesThread(void *args)
 			//Me posiciono en el l-esimo elemento de la lista
 			std::list<std::string>::iterator it=arg->file_names->begin();
 			int lfin = 0;
-			while(lfin<l){it++;}
+			while(lfin<l){it++;lfin++;}
 			// Paja tener que copiar algo que se devuelve por copia. No puedo tomar el puntero a la copia devuelta ya que es temporal.
 			arg->hashmap = new ConcurrentHashMap(count_words(*it));
 		}
