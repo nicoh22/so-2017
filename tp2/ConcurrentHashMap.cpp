@@ -332,7 +332,7 @@ tupla ConcurrentHashMap::maximums_sin_concurrencia(unsigned int p_archivos, unsi
 	pthread_t threads[p_archivos];
 	int tid;
 	pthread_mutex_t file_lock_list[archs.size()];
-	lockNFileNMap args[archs.size()];
+	lockNFileNMap args[p_archivos];
 	for(int i = 0; i < archs.size(); i++)
 	{
 		pthread_mutex_init(&file_lock_list[i], NULL);
