@@ -36,6 +36,7 @@ class ConcurrentHashMap
 		static void *process_files_Thread(void *args);
 		static void *readFilesThread(void *args);
 		void findMaximums(void * args);
+		void merge(ConcurrentHashMap& cm);
 };
 
 #endif /* CONCURRENT_HASH_MAP_H__ */

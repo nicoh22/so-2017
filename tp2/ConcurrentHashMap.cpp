@@ -312,18 +312,15 @@ void * ConcurrentHashMap::readFilesThread(void *args)
 	
 	for (int l = 0; l < arg->file_names->size(); l++)
 	{		
-		if(pthread_mutex_trylock(&(arg[l].file_locks[l])) == 0)
+		if(pthread_mutex_trylock(&(arg->file_locks[l])) == 0)
 		{
-			// No entiendo las siguientes sentencias...ademas el metodo es estatico (1)
-			//fileNMap args2;
-			//args2.hashmap = arg->hashmap;
 
-			//Me posiciono en el l-esimo elemento de la lista
 			std::list<std::string>::iterator it=arg->file_names->begin();
 			int lfin = 0;
 			while(lfin<l){it++;lfin++;}
 			// Paja tener que copiar algo que se devuelve por copia. No puedo tomar el puntero a la copia devuelta ya que es temporal.
-			arg[l].hashmap = new ConcurrentHashMap(count_words(*it));
+			ConcurrentHashMap cm = count_words(*it);
+			arg->hashmap->merge(cm);
 		}
 	}
 }
@@ -332,20 +329,21 @@ tupla ConcurrentHashMap::maximums_sin_concurrencia(unsigned int p_archivos, unsi
 	pthread_t threads[p_archivos];
 	int tid;
 	pthread_mutex_t file_lock_list[archs.size()];
-	lockNFileNMap args[archs.size()];
+	lockNFileNMap args;
+	ConcurrentHashMap total;
 	//Creo tantas estructuras como archivos
 	for(int i = 0; i < archs.size(); i++)
 	{
 		pthread_mutex_init(&file_lock_list[i], NULL);
-		args[i].hashmap = NULL;
-		args[i].file_names = &archs;
-		args[i].file_locks = file_lock_list;
 	}
+
+	args.hashmap = &total;
+	args.file_names = &archs;
+	args.file_locks = file_lock_list;
 	
 	//Creo los threads
 	for(tid = 0; tid < p_archivos; tid++)
 	{
-
 		pthread_create(&threads[tid], NULL, readFilesThread, (void *)&args);	
 	}
 	//Espero su finalizacion
@@ -353,33 +351,24 @@ tupla ConcurrentHashMap::maximums_sin_concurrencia(unsigned int p_archivos, unsi
 	{
 		pthread_join(threads[i], NULL);
 	}
-	//en args[tid].hashmap estan los mapas generados
-	ConcurrentHashMap total;
-	for(int j = 0; j < archs.size(); j++)
-	{
-		//TODO: merge
-		ConcurrentHashMap *actual = args[j].hashmap;
-		for(int t = 0; t < 26; t++)
-		{
-			Lista<tupla>::Iterador it = actual->tabla[t].CrearIt();
-			while(it.HaySiguiente())
-			{
-				tupla tup = it.Siguiente();
-				int cant = tup.second;
-				std::string key = tup.first;
-				for(int i = 0; i < cant; i++)
-				{
-					total.addAndInc(key);
-				}
-				it.Avanzar();
-			}
-		}
-		delete args[j].hashmap;
-	}
-	//mergeado
-	
-	return total.maximum(p_maximos);
-}
+ 	return total.maximum(p_maximos);
+ }
+
+ void ConcurrentHashMap::merge(ConcurrentHashMap& cm){
+ 	for(int t = 0; t < 26; t++)
+ 	{
+ 		Lista<tupla>::Iterador it = cm.tabla[t].CrearIt();
+ 		while(it.HaySiguiente())
+ 		{
+ 			tupla tup = it.Siguiente();
+ 			for(int i = 0; i < tup.second; i++)
+ 			{
+ 				this->addAndInc(tup.first);
+ 			}
+ 			it.Avanzar();
+ 		}
+ 	}
+ }
 
 tupla ConcurrentHashMap::concurrent_maximum(unsigned int p_archivos, unsigned int p_maximos, std::list<std::string> archs){
 	ConcurrentHashMap  hashmap = count_words(p_archivos, archs);
