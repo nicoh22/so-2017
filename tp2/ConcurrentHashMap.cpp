@@ -118,7 +118,7 @@ void ConcurrentHashMap::findMaximums(void *args)
 	maxtarg *arg = (maxtarg *) args;
 	for(int i = 0; i < 26; i++)
 	{
-		if(pthread_mutex_trylock(&(arg->locks[i]))==0)
+		if(pthread_mutex_trylock(&(arg->locks[i])) == 0)
 		{
 			Lista< tupla >::Iterador it = tabla[i].CrearIt();
 			//esta es la unica forma de saber si ListaAtomica esta vacia:
@@ -273,10 +273,10 @@ void * ConcurrentHashMap::process_files_Thread(void *args)
 
 ConcurrentHashMap ConcurrentHashMap::count_words(unsigned int n,std::list<std::string> archivos){
 	ConcurrentHashMap  hashmap;
-	pthread_t threads[archivos.size()];
+	pthread_t threads[n];
 	pthread_mutex_t file_lock_list[archivos.size()];
 	int tid;
-	lockNFileNMap args[archivos.size()];
+	lockNFileNMap args[n];
 
 	//Inicializo los locks de files
 	for(int i = 0; i < archivos.size(); i++)
@@ -298,6 +298,10 @@ ConcurrentHashMap ConcurrentHashMap::count_words(unsigned int n,std::list<std::s
 		pthread_join(threads[i], NULL);
 	}
 
+	for(int i = 0; i < archivos.size(); i++)
+	{
+		pthread_mutex_destroy(&file_lock_list[i], NULL);
+	}
 	return hashmap;
 }
 
@@ -308,7 +312,7 @@ void * ConcurrentHashMap::readFilesThread(void *args)
 	
 	for (int l = 0; l < arg->file_names->size(); l++)
 	{		
-		if(pthread_mutex_trylock(&(arg->file_locks[l])))
+		if(pthread_mutex_trylock(&(arg->file_locks[l])) == 0)
 		{
 			// No entiendo las siguientes sentencias...ademas el metodo es estatico (1)
 			//fileNMap args2;
