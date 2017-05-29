@@ -80,6 +80,7 @@ void ConcurrentHashMap::addAndInc(std::string key)
 		if(key.compare(it.Siguiente().first) == 0)
 		{
 			it.Siguiente().second++;
+			pthread_mutex_unlock(&lock_list[index]);
 			return;
 		}
 		it.Avanzar();
