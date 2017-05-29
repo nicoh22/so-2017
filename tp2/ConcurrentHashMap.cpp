@@ -312,7 +312,7 @@ void * ConcurrentHashMap::readFilesThread(void *args)
 	
 	for (int l = 0; l < arg->file_names->size(); l++)
 	{		
-		if(pthread_mutex_trylock(&(arg->file_locks[l])) == 0)
+		if(pthread_mutex_trylock(&(arg[l].file_locks[l])) == 0)
 		{
 			// No entiendo las siguientes sentencias...ademas el metodo es estatico (1)
 			//fileNMap args2;
@@ -323,7 +323,7 @@ void * ConcurrentHashMap::readFilesThread(void *args)
 			int lfin = 0;
 			while(lfin<l){it++;lfin++;}
 			// Paja tener que copiar algo que se devuelve por copia. No puedo tomar el puntero a la copia devuelta ya que es temporal.
-			arg->hashmap = new ConcurrentHashMap(count_words(*it));
+			arg[l].hashmap = new ConcurrentHashMap(count_words(*it));
 		}
 	}
 }
@@ -332,20 +332,20 @@ tupla ConcurrentHashMap::maximums_sin_concurrencia(unsigned int p_archivos, unsi
 	pthread_t threads[p_archivos];
 	int tid;
 	pthread_mutex_t file_lock_list[archs.size()];
-	lockNFileNMap args[p_archivos];
+	lockNFileNMap args[archs.size()];
 	for(int i = 0; i < archs.size(); i++)
 	{
 		pthread_mutex_init(&file_lock_list[i], NULL);
+		args[i].hashmap = NULL;
+		args[i].file_names = &archs;
+		args[i].file_locks = file_lock_list;
 	}
 	for(tid = 0; tid < p_archivos; tid++)
 	{
 
 		// No entiendo la siguiente sentencia...ademas el metodo es estatico (2)
 		//args[tid].hashmap = &hashmap;
-		args[tid].hashmap = NULL;
-		args[tid].file_names = &archs;
-		args[tid].file_locks = file_lock_list;
-		pthread_create(&threads[tid], NULL, readFilesThread, (void *)&args[tid]);	
+		pthread_create(&threads[tid], NULL, readFilesThread, (void *)&args);	
 	}
 
 	for(int i = 0; i < p_archivos; i++)
