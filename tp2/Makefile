@@ -83,6 +83,32 @@ test-maximums-run: test-maximums
 		./test-maximums $$((i + 1)) $$((j + 1)) >> results.csv ; \
 	done; done
 	rm -f corpus-max corpus-[0-4]
+
+
+test-equal: test-equal.cpp
+	$(CXX) $(CXXFLAGS) $(LDFLAGS) -o $@ test-equal.cpp $(OBJ) $(LDLIBS)
+
+test-equal-run: test-equal
+	printf "p_archivos, p_maximos, maximo concurrente, maximo no concurrente\n" > results.csv
+	for i in 0 1 2 3 4; do for j in 0 1 2 3 4; do \
+		./test-equal $$((i + 1)) $$((j + 1)) >> results.csv ; \
+	done; done
+test-max-dif: test-max-dif.cpp
+	$(CXX) $(CXXFLAGS) $(LDFLAGS) -o $@ test-max-dif.cpp $(OBJ) $(LDLIBS)
+
+test-max-dif-run: test-max-dif
+	printf "p_archivos, p_maximos, maximo concurrente, maximo no concurrente\n" > results.csv
+	for i in 0 1 2 3 4; do for j in 0 1 2 3 4; do \
+		./test-max-dif $$((i + 1)) $$((j + 1)) >> results.csv ; \
+	done; done
+test-max-prom: test-max-prom.cpp
+	$(CXX) $(CXXFLAGS) $(LDFLAGS) -o $@ test-max-prom.cpp $(OBJ) $(LDLIBS)
+
+test-max-prom-run: test-max-prom
+	printf "p_archivos, p_maximos, maximo concurrente, maximo no concurrente\n" > results.csv
+	for i in 0 1 2 3 4; do for j in 0 1 2 3 4; do \
+		./test-max-prom $$((i + 1)) $$((j + 1)) >> results.csv ; \
+	done; done
 clean:
 	rm -f $(BIN) $(OBJ)
 	rm -f corpus-*
