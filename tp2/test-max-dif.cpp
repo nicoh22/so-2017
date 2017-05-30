@@ -22,7 +22,7 @@ timespec diff(timespec start, timespec end)
 
 int main(int argc, char **argv) {
 	pair<string, unsigned int> p;
-	list<string> l = { "corpusA", "corpusB", "corpusC"};
+	list<string> l = { "corpusmuychico", "corpuschico", "corpusgrande"};
 
 	if (argc != 3) 
 	{
