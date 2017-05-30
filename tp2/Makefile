@@ -68,7 +68,6 @@ test-6-run: test-6
 	awk -f corpus.awk corpus | sort -nk 2 | tail -n 1 >corpus-max
 	for i in 0 1 2 3 4; do sed -n "$$((i * 500 + 1)),$$(((i + 1) * 500))p" corpus >corpus-"$$i"; done
 	for i in 0 1 2 3 4; do for j in 0 1 2 3 4; do \
-		echo "p_archivos = $$((i + 1)) p_maximos = $$((j + 1))"; \
 		./test-6 $$((i + 1)) $$((j + 1)) | diff -u - corpus-max; \
 	done; done
 	rm -f corpus-max corpus-[0-4]

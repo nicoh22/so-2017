@@ -4,7 +4,7 @@
 #include "ConcurrentHashMap.hpp"
 
 #define NANOSEC_PER_SEC 1000000000
-#define CORRIDAS 10
+#define CORRIDAS 100
 using namespace std;
 
 timespec diff(timespec start, timespec end)
@@ -22,7 +22,7 @@ timespec diff(timespec start, timespec end)
 
 int main(int argc, char **argv) {
 	pair<string, unsigned int> p;
-	list<string> l = { "corpus-0", "corpus-1", "corpus-2", "corpus-3", "corpus-4" };
+	list<string> l = { "corpusmuychico", "corpuschico", "corpusgrande"};
 
 	if (argc != 3) 
 	{
@@ -49,8 +49,8 @@ int main(int argc, char **argv) {
 		//cout << p.first << " " << p.second << endl;
 		timespec tspc = diff(maxcstart,maxcend);
 		timespec tspnc = diff(maxncstart,maxncend);
-		long long tiempoConcurrente = tspc.tv_sec * NANOSEC_PER_SEC + tspc.tv_nsec;
-		long long tiempoNoConcurrente = tspnc.tv_sec * NANOSEC_PER_SEC + tspnc.tv_nsec;
+		long long tiempoConcurrente = (tspc.tv_sec * NANOSEC_PER_SEC) + tspc.tv_nsec;
+		long long tiempoNoConcurrente = (tspnc.tv_sec * NANOSEC_PER_SEC) + tspnc.tv_nsec;
 		sumaC += tiempoConcurrente;
 		sumaNC += tiempoNoConcurrente;
 

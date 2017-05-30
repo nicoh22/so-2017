@@ -254,7 +254,7 @@ void * ConcurrentHashMap::process_files_Thread(void *args)
 	lockNFileNMap *arg = (lockNFileNMap *) args;
 	for (int l = 0; l < arg->file_names->size(); l++)
 	{
-		if(pthread_mutex_trylock(&(arg->file_locks[l]))==0){
+		if(pthread_mutex_trylock(&(arg->file_locks[l])) == 0){
 			fileNMap args2;
 			args2.hashmap = arg->hashmap;
 
@@ -264,7 +264,7 @@ void * ConcurrentHashMap::process_files_Thread(void *args)
 			int lfin = 0;
 			while(lfin<l){it++;lfin++;}
 
- 			args2.filename = &(*it);//si tu viejo es zapaterooo...:P
+ 			args2.filename = &(*it);
 			count_words_Thread(&args2);
 		}
 	}
@@ -276,7 +276,10 @@ ConcurrentHashMap ConcurrentHashMap::count_words(unsigned int n,std::list<std::s
 	pthread_t threads[n];
 	pthread_mutex_t file_lock_list[archivos.size()];
 	int tid;
-	lockNFileNMap args[n];
+	lockNFileNMap args;
+	args.hashmap = &hashmap;
+	args.file_names = &archivos;
+	args.file_locks = file_lock_list;
 
 	//Inicializo los locks de files
 	for(int i = 0; i < archivos.size(); i++)
@@ -287,10 +290,7 @@ ConcurrentHashMap ConcurrentHashMap::count_words(unsigned int n,std::list<std::s
 	//Asigno trabajo a los threads
 	for(tid = 0; tid < n; tid++)
 	{
-		args[tid].hashmap = &hashmap;
-		args[tid].file_names = &archivos;
-		args[tid].file_locks = file_lock_list;
-		pthread_create(&threads[tid], NULL, process_files_Thread, (void *)&args[tid]);	
+		pthread_create(&threads[tid], NULL, process_files_Thread, (void *)&args);	
 	}
 
 	for(int i = 0; i < n; i++)
@@ -361,11 +361,25 @@ tupla ConcurrentHashMap::maximums_sin_concurrencia(unsigned int p_archivos, unsi
  		while(it.HaySiguiente())
  		{
  			tupla tup = it.Siguiente();
- 			for(int i = 0; i < tup.second; i++)
- 			{
- 				this->addAndInc(tup.first);
- 			}
- 			it.Avanzar();
+			unsigned int index = hash(tup.first);
+			pthread_mutex_lock(&lock_list[index]);
+			Lista< tupla >::Iterador it2 = tabla[index].CrearIt();
+			bool insert = false;
+			while(it2.HaySiguiente())
+			{
+				if(tup.first.compare(it2.Siguiente().first) == 0)
+				{
+					it2.Siguiente().second += tup.second;
+					insert = true;
+				}
+				it2.Avanzar();
+			}
+			if(!insert)
+			{
+				tabla[index].push_front(tup);
+			}
+			pthread_mutex_unlock(&lock_list[index]);
+			it.Avanzar();
  		}
  	}
  }
