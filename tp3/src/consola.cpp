@@ -79,14 +79,7 @@ static void load(list<string> params) {
         p = ((p + 1) % world_size - 1) + 1;
     }
 
-    //while (file >> read_word) {
-        addAndInc(read_word);
-    //}
-    if (!file.eof()) {
-        cerr << "Error al abrir el archivo '" << filename << "'" << endl;
-    }
-    file.close();
-
+    
 /*
     for (list<string>::iterator it=params.begin(); it != params.end(); ++it) {
        
