@@ -90,16 +90,54 @@ static void load(list<string> params) {
 
 // Esta función debe avisar a todos los nodos que deben terminar
 static void quit() {
-    sendInst(SHORT_QUIT, NULL, 0);
+	char op = SHORT_QUIT;
+	MPI_Bcast(&op, 1, MPI_CHAR, 0, MPI_COMM_WORLD);
+	MPI_Finalize();
 }
 
 // Esta función calcula el máximo con todos los nodos
 static void maximum() {
+
+	HashMap hmMax;
     pair<string, unsigned int> result;
-    sendInst(SHORT_MAXIMUM, NULL, 0);
-    // TODO: Implementar
-    string str("a");
-    result = make_pair(str,10);
+    
+	bool nReadyArr[world_size - 1];
+	int nReadyCount = 0;
+
+	char op = SHORT_MAXIMUM;
+	MPI_REQUEST req;
+	MPI_Ibcast(&op, 1, MPI_CHAR, 0, MPI_COMM_WORLD, req);
+
+	while(nReadyCount < world_size){
+		MPI_Status status;
+		MPI_Probe(MPI_ANY_SOURCE, 0, MPI_COMM_WORLD, &status);
+		int messageSize;
+		MPI_Get_count(&status, MPI_INT, &messageSize);
+
+		char data[messageSize];//Puede cambiar
+
+		MPI_Recv(&data, messageSize, MPI_CHAR, status.MPI_SOURCE, status.MPI_TAG, MPI_COMM_WORLD, &status);
+		
+		char word = strncpy(data-4);//pseudo
+		int count = (int) *(data-4);
+
+		if(count == 0){
+			nReadyArr[status.MPI_TAG - 1] = true;
+			nReadyCount++;
+			continue;
+		}
+
+		for(int i = 0; i < count; i++){
+			hmMax.addAndInc(word);
+		}
+
+	}
+
+//	sendInst(SHORT_MAXIMUM, NULL, 0);
+
+	result = hmMax.maximum();
+    //string str("a");
+    //result = make_pair(str,10);
 
     cout << "El máximo es <" << result.first <<"," << result.second << ">" << endl;
 }
@@ -110,6 +148,10 @@ static void member(string key) {
     bool nodos[world_size];
     sendInst(SHORT_MEMBER, NULL, 0);
 
+	int size = key.size();
+
+	MPI_Bcast(&size, 1, MPI_INT, 0, MPI_COMM_WORLD);
+	MPI_Bcast(&key.c_str(), size, MPI_CHAR, 0, MPI_COMM_WORLD);
 
     MPI_Gather(
         &esta,
