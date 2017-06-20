@@ -42,50 +42,6 @@ void nodo(unsigned int rank) {
     }
 }
 
-void nodoMember(){
-	int size;
-	MPI_Bcast(&size, 1, MPI_INT, 0, MPI_COMM_WORLD);
-	char key[size];
-	MPI_Bcast(&key, size, MPI_CHAR, 0, MPI_COMM_WORLD);
-
-	bool esta = local.member(key); 
-	bool nodos[world_size];
-
-	trabajarArduamente();
-    MPI_Gather(
-        &esta,
-        1,
-        MPI_CHAR,
-        &nodos,
-        world_size,
-        MPI_CHAR,
-        0,
-        MPI_COMM_WORLD);
-}
-
-void nodoMaximum(){
-	//TODO: empaquetar el count en el buffer con tamaño int
-	HashMap::iterator it;
-	MPI_REQUEST req;
-	string actual;
-	int count = 0;
-	for(it = local.begin(); it !=local.end(); it++){
-		if(count == 0){
-			actual = *it;
-		}
-		if(strncmp(actual, *it) == 0){
-			count++;
-		}
-		else{
-			actual.append(count);
-			MPI_Isend(&actual, actual.size()+1, MPI_CHAR, 0, 0, MPI_COMM_WORLD, &req);
-			count = 0;
-		}
-	}
-	char buffer = {0, 0};
-	MPI_Isend(&buffer, 2, MPI_CHAR, 0, 0, MPI_COMM_WORLD, &req);
-}
-
 void nodoAdd(){
 	//double timestamp = MPI_Wtime();
 	//double times[world_size];
@@ -113,6 +69,51 @@ void nodoAdd(){
 	local.addAndInc(key);
 
 }
+void nodoMember(){
+	int size;
+	MPI_Bcast(&size, 1, MPI_INT, 0, MPI_COMM_WORLD);
+	char key[size];
+	MPI_Bcast(&key, size, MPI_CHAR, 0, MPI_COMM_WORLD);
+
+	bool esta = local.member(key); 
+	bool nodos[world_size];
+
+	trabajarArduamente();
+    MPI_Gather(
+        &esta,
+        1,
+        MPI_CHAR,
+        &nodos,
+        world_size,
+        MPI_CHAR,
+        0,
+        MPI_COMM_WORLD);
+}
+
+void nodoMaximum(){
+	//TODO: empaquetar el count en el buffer con tamaño int
+	HashMap::iterator it;
+	MPI_REQUEST req;
+	string actual;
+	int count = 0;
+	trabajarArduamente();
+	for(it = local.begin(); it !=local.end(); it++){
+		if(count == 0){
+			actual = *it;
+		}
+		if(strncmp(actual, *it) == 0){
+			count++;
+		}
+		else{
+			actual.append(count);
+			MPI_Isend(&actual, actual.size()+1, MPI_CHAR, 0, 0, MPI_COMM_WORLD, &req);
+			count = 0;
+		}
+	}
+	char buffer = {0, 0};
+	MPI_Isend(&buffer, 2, MPI_CHAR, 0, 0, MPI_COMM_WORLD, &req);
+}
+
 void nodoQuit(){
 	MPI_Finalize();
 }
