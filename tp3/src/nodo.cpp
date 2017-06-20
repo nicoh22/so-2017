@@ -15,7 +15,6 @@ HashMap local;
 void nodo(unsigned int rank) {
     printf("Soy un nodo. Mi rank es %d \n", rank);
 
-    // TODO: Implementar
     // Creo un HashMap loal
 
 	char operation;
@@ -64,6 +63,29 @@ void nodoMember(){
         MPI_COMM_WORLD);
 }
 
+void nodoMaximum(){
+	//TODO: empaquetar el count en el buffer con tamaño int
+	HashMap::iterator it;
+	MPI_REQUEST req;
+	string actual;
+	int count = 0;
+	for(it = local.begin(); it !=local.end(); it++){
+		if(count == 0){
+			actual = *it;
+		}
+		if(strncmp(actual, *it) == 0){
+			count++;
+		}
+		else{
+			actual.append(count);
+			MPI_Isend(&actual, actual.size()+1, MPI_CHAR, 0, 0, MPI_COMM_WORLD, &req);
+			count = 0;
+		}
+	}
+	char buffer = {0, 0};
+	MPI_Isend(&buffer, 2, MPI_CHAR, 0, 0, MPI_COMM_WORLD, &req);
+}
+
 void nodoAdd(){
 	//double timestamp = MPI_Wtime();
 	//double times[world_size];
@@ -71,6 +93,7 @@ void nodoAdd(){
 
 	int yo = world_rank;
 	MPI_REQUEST req;
+	trabajarArduamente();
 	MPI_Isend(&yo, 1, MPI_INT, 0, 0, MPI_COMM_WORLD, &req);
 
 	int winnerRank;
@@ -89,7 +112,6 @@ void nodoAdd(){
 
 	local.addAndInc(key);
 
-	trabajarArduamente();
 }
 void nodoQuit(){
 	MPI_Finalize();
