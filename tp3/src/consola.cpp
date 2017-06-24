@@ -114,7 +114,7 @@ static void maximum() {
 	HashMap hmMax;
     pair<string, unsigned int> result;
     
-	bool nReadyArr[np - 1];
+//	bool nReadyArr[np - 1];
 	int nReadyCount = 0;
 
 	char op = SHORT_MAXIMUM;
@@ -129,7 +129,7 @@ static void maximum() {
 		int count = message.second;
 
 		if(count == 0){
-			nReadyArr[process - 1] = true;
+//			nReadyArr[process - 1] = true;
 			nReadyCount++;
 			continue;
 		}
