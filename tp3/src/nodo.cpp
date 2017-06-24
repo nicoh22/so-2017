@@ -3,24 +3,30 @@
 #include "mpi.h"
 #include <unistd.h>
 #include <stdlib.h>
+#include <fstream>
+#include <string.h>
 
 #define SHORT_LOAD    'l'
 #define SHORT_ADD     'a'
 #define SHORT_MEMBER  'm'
 #define SHORT_MAXIMUM 'x'
 #define SHORT_QUIT   'q'
+
 using namespace std;
 
-HashMap local;// Creo un HashMap local
-void nodo(unsigned int rank) {
-    printf("Soy un nodo. Mi rank es %d \n", rank);
+static unsigned int np;
+static unsigned int rank;
 
+HashMap local;// Creo un HashMap local
+void nodo(unsigned int rank_param) {
+    printf("Soy un nodo. Mi rank es %d \n", rank);
+    	//np = np_param; Sera que si podemos tocar esta firma? Si no tenemos que mandar mensajes solo por esto
+	rank = rank_param;
 	char operation;
 	MPI_Status status;
 	int sizeCmd;
 
     while (true) {
-		//MPI_Bcast(&operation, 1, MPI_CHAR, 0, MPI_COMM_WORLD);
 		MPI_Probe(0, 0, MPI_COMM_WORLD, &status);
 		MPI_Get_count(&status, MPI_CHAR, &sizeCmd);
 		char cmd[sizeCmd];
@@ -34,16 +40,16 @@ void nodo(unsigned int rank) {
 				data[i-1] = cmd[i];
 			}
 		}
-
+		// Paso data sin &. No me queda claro el error que tira el compilador si se usa.
 		switch(operation){
 			case SHORT_LOAD:
-				nodoLoad(&data);
+				nodoLoad(data);
 				break;
 			case SHORT_ADD:
-				nodoAdd(&data);
+				nodoAdd(data);
 				break;
 			case SHORT_MEMBER:
-				nodoMember(&data);
+				nodoMember(data);
 				break;
 			case SHORT_MAXIMUM:
 				nodoMaximum();
@@ -58,10 +64,10 @@ void nodo(unsigned int rank) {
 }
 
 void nodoLoad(char *data){
-    std::ifstream myfile(data);
+    ifstream myfile(data, ifstream::in);
     if (myfile.is_open())
 	{
-		std::string word;
+	    string word;
 	    while (myfile >> word )
 		{
 			local.addAndInc(word);
@@ -72,14 +78,15 @@ void nodoLoad(char *data){
 }
 void nodoAdd(char *data){
 
-	int yo = world_rank;
-	MPI_REQUEST req;
+	int yo = rank;
+	MPI_Request req;
 	trabajarArduamente();
 	MPI_Isend(&yo, 1, MPI_INT, 0, 0, MPI_COMM_WORLD, &req);
 
-	int winnerRank;
-	MPI_Recv(&winnerRank, 1, MPI_INT, 0, 0, MPI_COMM_WORLD);
-	if(winnerRank != world_rank){
+	unsigned int winnerRank;
+	MPI_Status status;
+	MPI_Recv(&winnerRank, 1, MPI_INT, 0, 0, MPI_COMM_WORLD, &status);
+	if(winnerRank != rank){
 		return;
 	}
 
@@ -93,7 +100,7 @@ void nodoMember(){
 	MPI_Bcast(&key, size, MPI_CHAR, 0, MPI_COMM_WORLD);
 
 	bool esta = local.member(key); 
-	bool nodos[world_size];
+	bool nodos[np];
 
 	trabajarArduamente();
     MPI_Gather(
@@ -101,24 +108,23 @@ void nodoMember(){
         1,
         MPI_CHAR,
         &nodos,
-        world_size,
+        np,
         MPI_CHAR,
         0,
         MPI_COMM_WORLD);
 }
 
 void nodoMaximum(){
-	HashMap::iterator it;
-	MPI_REQUEST req;
+	MPI_Request req;
 	string actual;
 	int count = 0;
 	char *packedCount = (char *) &count; 
 	trabajarArduamente();
-	for(it = local.begin(); it !=local.end(); it++){
+	for(HashMap::iterator it = local.begin(); it !=local.end(); it++){
 		if(count == 0){
 			actual = *it;
 		}
-		if(strncmp(actual, *it) == 0){
+		if(actual.compare(*it) == 0){
 			count++;
 		}
 		else{
@@ -128,7 +134,8 @@ void nodoMaximum(){
 			count = 0;
 		}
 	}
-	char buffer = {0, 0};
+	// Los estoy pasando como char a los ceros...
+	char buffer[] = {'0','0'};
 	MPI_Isend(&buffer, 2, MPI_CHAR, 0, 0, MPI_COMM_WORLD, &req);
 }
 
