@@ -7,7 +7,7 @@
  * Recibe el rank del nodo.
  */
 void nodo(unsigned int rank);
-
+/* Comandos que recibe */
 /* Simula un tiempo de procesamiento no determinístico.
  */
 void trabajarArduamente();
