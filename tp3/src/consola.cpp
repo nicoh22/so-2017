@@ -181,10 +181,12 @@ static void addAndInc(string key) {
     //int p = chooseProcess();
     char buffer[key.size()];
 
+	/*
     buffer[0] = SHORT_ADD;
     for(unsigned int k = 0; k < key.size(); k++){
         buffer[k + 1] = key[k];
     }
+	*/
 
 	sendInst(SHORT_ADD, key.c_str(), key.size());
 

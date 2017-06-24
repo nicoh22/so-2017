@@ -7,7 +7,14 @@
  * Recibe el rank del nodo.
  */
 void nodo(unsigned int rank);
-/* Comandos que recibe */
+/* Comandos que recibe el nodo (desde la consola)
+ * */
+void nodoLoad(char *data);
+void nodoAdd(char *data);
+void nodoMember(char *data);
+void nodoMaximum();
+void nodoQuit();
+
 /* Simula un tiempo de procesamiento no determinístico.
  */
 void trabajarArduamente();
