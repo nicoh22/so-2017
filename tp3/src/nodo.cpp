@@ -5,6 +5,7 @@
 #include <stdlib.h>
 #include <fstream>
 #include <string.h>
+#include <iostream>
 
 #define SHORT_LOAD    'l'
 #define SHORT_ADD     'a'
@@ -70,9 +71,12 @@ void nodoLoad(char *data){
 		{
 			local.addAndInc(word);
 	    }
+		cout << "Process " << myRank << " make the load of " << data << endl;
 	}
 	myfile.close();
+	cout << "Enviando ready..." << myRank << endl;
 	MPI_Send("r", 1, MPI_CHAR, 0, 0, MPI_COMM_WORLD);
+	cout << "Ready leido... " << myRank << endl;
 }
 void nodoAdd(char *data){
 
@@ -104,7 +108,7 @@ void nodoMember(char *data){
         &esta,
         1,
         MPI_CHAR,
-        nullptr,
+        NULL,
         0,
         MPI_CHAR,
         0,

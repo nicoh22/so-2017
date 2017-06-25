@@ -38,13 +38,27 @@ pair<string, int> parseMessage(string message){
 
 //Recibe de forma bloqueante cualquier mensaje de cualquier nodo.
 //Retorna el mensaje y el proceso que lo envio
-pair< string, int> receiveFromAnyBloq(){
+
+// CORRER CON: 3 nodos (2 seran slave) y hacer load de a1.txt a2.txt a3.txt
+// NOTA 1: Si #archivos <= #nodos solo entra al primer ciclo y nunca se realiza el ciclo que hace receiveFromAnyBloq
+// Habria que liberar los mensajes enviados por los primeros min(#archivos, #nodos) en ese caso.
+// Si #archivos > #nodos hay que liberar aquellos sends que no vayan a leerse porque ya no hay archivos. No veo bien la cuenta ahora.
+// Esto tiene que hacerse además de ser necesario para liberar el buffer, porque los sends que se hacen en load por parte de los nodos son bloqueantes. Si nadie los lee quedan bloqueados.
+// Por alguna razon igualmente, si se corre el test, se puede apreciar que itera para todos los nodos ya que el primero devuelve "r" + basura y por eso falla al comparar y el segundo nodo devuelve "r" (con primero y segundo no hablo de los ranks). 
+// No se que onda ahi con respecto a la basura que viene con el primer nodo.
+pair< string, int> receiveFromAnyBloq(MPI_Datatype datatype){
 	MPI_Status status;
+	cout << "Probando..." << endl;
 	MPI_Probe(MPI_ANY_SOURCE, 0, MPI_COMM_WORLD, &status);
 	int messageSize;
-	MPI_Get_count(&status, MPI_INT, &messageSize);
+	cout << "Mensaje de " << status.MPI_SOURCE << " Con id " << status.MPI_TAG << endl;	
+	cout << "Cuanto?..." << endl;
+	MPI_Get_count(&status, datatype, &messageSize);
+	cout << "Creo arreglo de " << messageSize << endl;
 	char *data = new char[messageSize];
-	MPI_Recv(&data, messageSize, MPI_CHAR, status.MPI_SOURCE, status.MPI_TAG, MPI_COMM_WORLD, &status);
+	cout << "Leo de " << status.MPI_SOURCE << endl;
+	MPI_Recv(data, messageSize, MPI_CHAR, status.MPI_SOURCE, status.MPI_TAG, MPI_COMM_WORLD, &status);
+	cout << "Data de nodo es " << data << endl;
 	string res(data);
 	delete data;
 	return make_pair(res, status.MPI_SOURCE);
@@ -75,7 +89,7 @@ static void load(list<string> params) {
     list<string>::iterator it=params.begin();
     MPI_Request requests[np];
     for(int p = 1; ((unsigned int) p) < np; p++){
-        if(((unsigned int)p) >= params.size()) break;
+        if(((unsigned int)p) > params.size()) break;
 		int sizeFilename = (*it).size();
 		char fileMessage[sizeFilename + 1];
 		buildMessage(SHORT_LOAD, (*it).c_str(), sizeFilename, fileMessage);
@@ -84,10 +98,13 @@ static void load(list<string> params) {
     }
     int p;
     while(it != params.end()){
-		pair<string, int> response = receiveFromAnyBloq();
+		cout << "File " << *it << endl;
+		cout << "Entra a 2do while" << endl;
+		pair<string, int> response = receiveFromAnyBloq(MPI_CHAR);
+		cout << "Recibe de " << response.second << endl;
 		p = response.second;
 		string fileReady = "r";
-		if(strncmp(response.first.c_str(), fileReady.c_str(), response.first.size()) == 0 ){
+		if(response.first.compare(fileReady) == 0 ){
 			int sizeFilename = (*it).size();
 			char fileMessage[sizeFilename + 1];
 			buildMessage(SHORT_LOAD, (*it).c_str(), sizeFilename, fileMessage);
@@ -97,14 +114,14 @@ static void load(list<string> params) {
 	}
 
     
-    cout << "La listá esta procesada" << endl;
+    cout << "La lista esta procesada" << endl;
 }
 
 // Esta función debe avisar a todos los nodos que deben terminar
 static void quit() {
 	char op = SHORT_QUIT;
 	//MPI_Bcast(&op, 1, MPI_CHAR, 0, MPI_COMM_WORLD);
-	sendInst(op, nullptr, 0);
+	sendInst(op, NULL, 0);
 	MPI_Finalize();
 }
 
@@ -118,11 +135,11 @@ static void maximum() {
 	int nReadyCount = 0;
 
 	char op = SHORT_MAXIMUM;
-	sendInst(op, nullptr, 0);
+	sendInst(op, NULL, 0);
 
 
 	while(((unsigned int) nReadyCount) < np){
-		pair<string, int> response = receiveFromAnyBloq();
+		pair<string, int> response = receiveFromAnyBloq(MPI_CHAR);
 		pair<string, int> message = parseMessage(response.first);
 		int process = response.second;
 		string word = message.first;
@@ -190,7 +207,7 @@ static void addAndInc(string key) {
 
 	sendInst(SHORT_ADD, key.c_str(), key.size());
 
-	pair<string, int> winner = receiveFromAnyBloq(); 
+	pair<string, int> winner = receiveFromAnyBloq(MPI_INT); 
 	int winnerProcess = winner.second; 
     MPI_Request req[np];
 
@@ -200,7 +217,7 @@ static void addAndInc(string key) {
 
 	for(unsigned int i = 0; i < np-2; i++){
 		//TODO: si tengo un solo nodo funca todo bien?
-		receiveFromAnyBloq();//Liberamos buffer de mensajes
+		receiveFromAnyBloq(MPI_INT);//Liberamos buffer de mensajes
 	}
 
     cout << "Agregado: " << key << endl;
