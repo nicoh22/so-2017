@@ -46,6 +46,21 @@ pair<string, int> parseMessage(string message){
 // Esto tiene que hacerse además de ser necesario para liberar el buffer, porque los sends que se hacen en load por parte de los nodos son bloqueantes. Si nadie los lee quedan bloqueados.
 // Por alguna razon igualmente, si se corre el test, se puede apreciar que itera para todos los nodos ya que el primero devuelve "r" + basura y por eso falla al comparar y el segundo nodo devuelve "r" (con primero y segundo no hablo de los ranks). 
 // No se que onda ahi con respecto a la basura que viene con el primer nodo.
+
+int calculateType(MPI_Datatype datatype) {
+	int mult = 1;
+
+	switch(datatype){
+		case MPI_INT:
+			mult = 1;
+			break;
+		default:
+			break;
+	}
+
+	return mult;
+}
+
 pair< string, int> receiveFromAnyBloq(MPI_Datatype datatype){
 	MPI_Status status;
 	cout << "Probando..." << endl;
@@ -55,9 +70,9 @@ pair< string, int> receiveFromAnyBloq(MPI_Datatype datatype){
 	cout << "Cuanto?..." << endl;
 	MPI_Get_count(&status, datatype, &messageSize);
 	cout << "Creo arreglo de " << messageSize << endl;
-	char *data = new char[messageSize];
+	char *data = new char[messageSize*calculateType(datatype)];
 	cout << "Leo de " << status.MPI_SOURCE << endl;
-	MPI_Recv(data, messageSize, MPI_CHAR, status.MPI_SOURCE, status.MPI_TAG, MPI_COMM_WORLD, &status);
+	MPI_Recv(data, messageSize, datatype, status.MPI_SOURCE, status.MPI_TAG, MPI_COMM_WORLD, &status);
 	cout << "Data de nodo es " << data << endl;
 	string res(data);
 	delete data;
@@ -88,19 +103,24 @@ static void load(list<string> params) {
 	//char op = SHORT_LOAD;
     list<string>::iterator it=params.begin();
     MPI_Request requests[np];
+
+	int msgNotRead = 0;
+
     for(int p = 1; ((unsigned int) p) < np; p++){
         if(((unsigned int)p) > params.size()) break;
 		int sizeFilename = (*it).size();
 		char fileMessage[sizeFilename + 1];
 		buildMessage(SHORT_LOAD, (*it).c_str(), sizeFilename, fileMessage);
-		MPI_Issend(fileMessage, sizeFilename + 1, MPI_CHAR, p, 0, MPI_COMM_WORLD, &requests[p]);
+		MPI_Isend(fileMessage, sizeFilename + 1, MPI_CHAR, p, 0, MPI_COMM_WORLD, &requests[p]);
         it++;
+		msgNotRead++;
     }
     int p;
     while(it != params.end()){
 		cout << "File " << *it << endl;
 		cout << "Entra a 2do while" << endl;
 		pair<string, int> response = receiveFromAnyBloq(MPI_CHAR);
+		msgNotRead--;
 		cout << "Recibe de " << response.second << endl;
 		p = response.second;
 		string fileReady = "r";
@@ -108,12 +128,18 @@ static void load(list<string> params) {
 			int sizeFilename = (*it).size();
 			char fileMessage[sizeFilename + 1];
 			buildMessage(SHORT_LOAD, (*it).c_str(), sizeFilename, fileMessage);
-			MPI_Issend(fileMessage, sizeFilename + 1, MPI_CHAR, p, 0, MPI_COMM_WORLD, &requests[p]);
+			MPI_Isend(fileMessage, sizeFilename + 1, MPI_CHAR, p, 0, MPI_COMM_WORLD, &requests[p]);
 			it++;
+			msgNotRead++;
 		}
 	}
 
-    
+	cout << "# Mensajes no liberados " << msgNotRead << endl;
+
+	for(int i = 0; i < msgNotRead; i++){
+		receiveFromAnyBloq(MPI_CHAR);//Liberamos buffer de mensajes
+	}
+
     cout << "La lista esta procesada" << endl;
 }
 

@@ -75,7 +75,7 @@ void nodoLoad(char *data){
 	}
 	myfile.close();
 	cout << "Enviando ready..." << myRank << endl;
-	MPI_Send("r", 1, MPI_CHAR, 0, 0, MPI_COMM_WORLD);
+	MPI_Ssend("r", 1, MPI_CHAR, 0, 0, MPI_COMM_WORLD);
 	cout << "Ready leido... " << myRank << endl;
 }
 void nodoAdd(char *data){
