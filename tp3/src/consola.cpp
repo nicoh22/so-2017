@@ -217,6 +217,7 @@ static void addAndInc(string key) {
 
 	for(unsigned int i = 0; i < np-2; i++){
 		//TODO: si tengo un solo nodo funca todo bien?
+		//RTA: si tenes un solo nodo ni entra el for: i < 2-2 = 0
 		receiveFromAnyBloq(MPI_INT);//Liberamos buffer de mensajes
 	}
 
