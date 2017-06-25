@@ -52,7 +52,7 @@ int calculateType(MPI_Datatype datatype) {
 
 	switch(datatype){
 		case MPI_INT:
-			mult = 1;
+			mult = 4;
 			break;
 		default:
 			break;
