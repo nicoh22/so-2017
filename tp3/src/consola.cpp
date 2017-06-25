@@ -47,8 +47,8 @@ pair<string, int> parseMessage(string message){
 // Por alguna razon igualmente, si se corre el test, se puede apreciar que itera para todos los nodos ya que el primero devuelve "r" + basura y por eso falla al comparar y el segundo nodo devuelve "r" (con primero y segundo no hablo de los ranks). 
 // No se que onda ahi con respecto a la basura que viene con el primer nodo.
 
-int calculateType(MPI_Datatype datatype) {
-	int mult = 1;
+unsigned int calculateType(MPI_Datatype datatype) {
+	unsigned int mult = 1;
 
 	switch(datatype){
 		case MPI_INT:
@@ -70,9 +70,17 @@ pair< string, int> receiveFromAnyBloq(MPI_Datatype datatype){
 	cout << "Cuanto?..." << endl;
 	MPI_Get_count(&status, datatype, &messageSize);
 	cout << "Creo arreglo de " << messageSize << endl;
-	char *data = new char[messageSize*calculateType(datatype)];
+
+	unsigned int totalSize = messageSize*calculateType(datatype);	
+
+	char *data = new char[totalSize];
+
+	for (unsigned int i = 0; i < totalSize; i++) {
+		data[i] = 0;
+	}
+
 	cout << "Leo de " << status.MPI_SOURCE << endl;
-	MPI_Recv(data, messageSize, datatype, status.MPI_SOURCE, status.MPI_TAG, MPI_COMM_WORLD, &status);
+	MPI_Recv(data, totalSize, datatype, status.MPI_SOURCE, status.MPI_TAG, MPI_COMM_WORLD, &status);
 	cout << "Data de nodo es " << data << endl;
 	string res(data);
 	delete data;
