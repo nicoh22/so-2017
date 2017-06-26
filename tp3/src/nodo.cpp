@@ -96,14 +96,14 @@ void nodoAdd(char *data){
 }
 
 void nodoMember(char *data){
-	int size;
-	MPI_Bcast(&size, 1, MPI_INT, 0, MPI_COMM_WORLD);
-	char key[size];
-	MPI_Bcast(&key, size, MPI_CHAR, 0, MPI_COMM_WORLD);
-
-	bool esta = local.member(key); 
+	bool esta = local.member(data); 
+	
+	cout << "En nodo " << myRank << " clave existe: " << esta << endl;
 
 	trabajarArduamente();
+
+	cout << "Nodo " << myRank << " Termina trabajo arduo" << endl;
+
     MPI_Gather(
         &esta,
         1,

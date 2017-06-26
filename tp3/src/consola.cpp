@@ -202,7 +202,6 @@ static void member(string key) {
     bool nodos[np];
 	int size = key.size();
 	char op = SHORT_MEMBER;
-	//sendInst(op, key.c_str(), size);
 	sendInst(op, key.c_str(), size);
 
     MPI_Gather(
