@@ -214,7 +214,7 @@ static void member(string key) {
         1,
         MPI_CHAR,
         &nodos,
-        np,
+        1,
         MPI_CHAR,
         0,
         MPI_COMM_WORLD);
@@ -234,7 +234,7 @@ static void member(string key) {
 static void addAndInc(string key) {
 
     //int p = chooseProcess();
-    char buffer[key.size()];
+    //char buffer[key.size()];
 
 	/*
     buffer[0] = SHORT_ADD;
