@@ -156,7 +156,6 @@ static void quit() {
 	char op = SHORT_QUIT;
 	//MPI_Bcast(&op, 1, MPI_CHAR, 0, MPI_COMM_WORLD);
 	sendInst(op, NULL, 0);
-	MPI_Finalize();
 }
 
 // Esta función calcula el máximo con todos los nodos

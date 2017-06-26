@@ -169,7 +169,7 @@ void nodoMaximum(){
 }
 
 void nodoQuit(){
-	MPI_Finalize();
+	//MPI_Finalize();
 }
 void trabajarArduamente() {
     int r = rand() % 2500000 + 500000;
