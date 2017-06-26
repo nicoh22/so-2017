@@ -41,9 +41,7 @@ pair<string, int> parseMessage(string message){
 //Retorna el mensaje y el proceso que lo envio
 
 // CORRER CON: 3 nodos (2 seran slave) y hacer load de a1.txt a2.txt a3.txt
-// NOTA 1: Si #archivos <= #nodos solo entra al primer ciclo y nunca se realiza el ciclo que hace receiveFromAnyBloq
-// Habria que liberar los mensajes enviados por los primeros min(#archivos, #nodos) en ese caso.
-// Si #archivos > #nodos hay que liberar aquellos sends que no vayan a leerse porque ya no hay archivos. No veo bien la cuenta ahora.
+// NOTA 1: En load siempre queda un remanente de mensajes no leidos. Hago receiveFromAnyBloq de los mismos.
 // Esto tiene que hacerse además de ser necesario para liberar el buffer, porque los sends que se hacen en load por parte de los nodos son bloqueantes. Si nadie los lee quedan bloqueados.
 
 unsigned int calculateType(MPI_Datatype datatype) {
