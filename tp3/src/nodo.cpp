@@ -6,6 +6,7 @@
 #include <fstream>
 #include <string.h>
 #include <iostream>
+#include <sstream>
 
 #define SHORT_LOAD    'l'
 #define SHORT_ADD     'a'
@@ -121,24 +122,50 @@ void nodoMaximum(){
 	int count = 0;
 	char *packedCount = (char *) &count; 
 	trabajarArduamente();
+	int flag = 1;
+	MPI_Status status;
+	cout << "Empezamo a enviar en nodo " << myRank << endl;
 	for(HashMap::iterator it = local.begin(); it !=local.end(); it++){
-		if(count == 0){
+		if(count == 0) {
+			// Solo la primera vez
 			actual = *it;
 		}
 		if(actual.compare(*it) == 0){
 			count++;
 		}
 		else{
-			//Empaquetamos la cantidad de repeticiones de la palabra a enviar.
+			//Empaquetamos la cantidad de repeticiones de la palabra a enviar.		
 			actual.append(packedCount, 4);
-			MPI_Isend(&actual, actual.size()+1, MPI_CHAR, 0, 0, MPI_COMM_WORLD, &req);
-			count = 0;
+
+			// Hay que hacer esto...Isend no es buffereado! O ver de usar Bsend (Hay que crear de antemano un buffer...)
+			while (!flag)
+			{
+				MPI_Test(&req, &flag, &status);
+			}
+			
+			cout << "Envia " << actual << " Rep " << count << endl;
+			cout << "Tamanio " << actual.size() << " nodo " << myRank << endl;
+			
+			// Se estaba mandando el puntero a un string...eso puede ser cualquiera.
+			const char *cactual = actual.c_str();
+			MPI_Isend(cactual, actual.size(), MPI_CHAR, 0, 0, MPI_COMM_WORLD, &req);
+			MPI_Test(&req, &flag, &status);
+			cout << "Leido " << flag << endl;
+			actual = *it;			
+			count = 1;
 		}
 	}
-	// Los estoy pasando como char a los ceros...
-	//un cero en char y un cero en int.
+
+	//Un cero en char y un cero en int.
 	char buffer[] = {0, 0, 0, 0, 0};
-	MPI_Isend(&buffer, 5, MPI_CHAR, 0, 0, MPI_COMM_WORLD, &req);
+	// Hay que hacer esto...Isend no es buffereado! O ver de usar Bsend (Hay que crear de antemano un buffer...)
+	while (!flag)
+	{
+		MPI_Test(&req, &flag, &status);
+	}
+
+	cout << "Envia " << buffer << " nodo " << myRank << endl;
+	MPI_Isend(buffer, 5, MPI_CHAR, 0, 0, MPI_COMM_WORLD, &req);
 }
 
 void nodoQuit(){
