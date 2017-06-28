@@ -1,3 +1,5 @@
+[MPI] Lanzando proceso 4
+Soy un nodo. Mi rank es 4 
 [MPI] Lanzando proceso 0
 Comandos disponibles:
   load <arch_1> <arch_2> ... <arch_n>
@@ -5,10 +7,31 @@ Comandos disponibles:
   member <string>
   maximum
   q|quit
-> [MPI] Lanzando proceso 1
-Soy un nodo. Mi rank es 1 
+> [MPI] Lanzando proceso 3
+Soy un nodo. Mi rank es 3 
+[MPI] Lanzando proceso 1
 [MPI] Lanzando proceso 2
 Soy un nodo. Mi rank es 2 
+Soy un nodo. Mi rank es 1 
 La lista esta procesada
-> El máximo es <auto,4>
-> 
+> > El máximo es <casa,3>
+> > El string <casa1> está
+> El string <gato> está
+> El string <perro> está
+> El string <estoy> no está
+> > El máximo es <casa,3>
+> > Agregado: casa2
+> Agregado: casa2
+> Agregado: casa2
+> Agregado: casa2
+> Agregado: casa2
+> Agregado: casa2
+> Agregado: casa2
+> Agregado: casa2
+> Agregado: casa2
+> Agregado: casa2
+> Agregado: casa2
+> Agregado: casa2
+> > El máximo es <casa,10>
+> [mpiexec@Reimu] Sending Ctrl-C to processes as requested
+[mpiexec@Reimu] Press Ctrl-C again to force abort

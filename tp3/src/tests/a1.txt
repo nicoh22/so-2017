@@ -1,0 +1,6 @@
+casa1
+gato
+perro
+casa1
+casa1
+gato
