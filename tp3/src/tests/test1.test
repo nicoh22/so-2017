@@ -1,14 +1,10 @@
-load a1.txt a2.txt a3.txt a4.txt a5.txt
-
+load tests/a1.txt tests/a2.txt tests/a3.txt tests/a4.txt tests/a5.txt
 maximum
-
 member casa1
 member gato
 member perro
 member estoy
-
 maximum
-
 addAndInc casa2
 addAndInc casa2
 addAndInc casa2
@@ -21,5 +17,5 @@ addAndInc casa2
 addAndInc casa2
 addAndInc casa2
 addAndInc casa2
-
 maximum
+quit
