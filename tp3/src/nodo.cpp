@@ -92,6 +92,7 @@ void nodoAdd(char *data){
 	local.addAndInc(data);
 }
 
+
 void nodoMember(char *data){
 	bool esta = local.member(data); 
 	
@@ -130,7 +131,7 @@ void nodoMaximum(){
 			
 			// Se estaba mandando el puntero a un string...eso puede ser cualquiera.
 			const char *cactual = actual.c_str();
-			MPI_Send(cactual, actual.size(), MPI_CHAR, 0, 0, MPI_COMM_WORLD);
+			MPI_Ssend(cactual, actual.size(), MPI_CHAR, 0, 0, MPI_COMM_WORLD);
 			actual = *it;			
 			count = 1;
 		}

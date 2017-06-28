@@ -1,6 +1,6 @@
-casa1
+auto
 gato
 perro
-casa1
-casa1
+auto
+auto
 gato

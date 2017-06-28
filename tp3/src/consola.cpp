@@ -109,7 +109,7 @@ static void load(list<string> params) {
 
     for(int p = 1; ((unsigned int) p) < np; p++){
         if(((unsigned int)p) > params.size()) break;
-		int sizeFilename = (*it).size();
+		int sizeFilename = (*it).size() + 1;
 		char fileMessage[sizeFilename + 1];
 		buildMessage(SHORT_LOAD, (*it).c_str(), sizeFilename, fileMessage);
 		MPI_Isend(fileMessage, sizeFilename + 1, MPI_CHAR, p, 0, MPI_COMM_WORLD, &requests[p]);
