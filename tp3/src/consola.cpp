@@ -228,7 +228,7 @@ static void addAndInc(string key) {
     }
 	*/
 
-	sendInst(SHORT_ADD, key.c_str(), key.size());
+	sendInst(SHORT_ADD, key.c_str(), key.size() + 1);
 
 	pair<string, int> winner = receiveFromAnyBloq(MPI_INT); 
 	int winnerProcess = winner.second; 

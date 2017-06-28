@@ -1,4 +1,4 @@
-casa1
+auto
 gato
 gato
 perro

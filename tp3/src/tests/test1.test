@@ -1,21 +1,21 @@
 load tests/a1.txt tests/a2.txt tests/a3.txt tests/a4.txt tests/a5.txt
 maximum
-member casa1
+member auto
 member gato
 member perro
 member estoy
 maximum
-addAndInc casa2
-addAndInc casa2
-addAndInc casa2
-addAndInc casa2
-addAndInc casa2
-addAndInc casa2
-addAndInc casa2
-addAndInc casa2
-addAndInc casa2
-addAndInc casa2
-addAndInc casa2
-addAndInc casa2
+addAndInc bici
+addAndInc bici
+addAndInc bici
+addAndInc bici
+addAndInc bici
+addAndInc bici
+addAndInc bici
+addAndInc bici
+addAndInc bici
+addAndInc bici
+addAndInc bici
+addAndInc bici
 maximum
 quit
