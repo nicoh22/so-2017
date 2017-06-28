@@ -31,7 +31,6 @@ static unsigned int np;
 //Desempaqueta un mensaje. El mismo contiene una palabra y
 //su cantidad de repeticiones.
 pair<string, int> parseMessage(string message){
-	cout << "Parsing " << message << endl;
 	string word = message.substr(0, message.size() - 4);
 	int count = *((int *) message.substr(message.size() - 4, 4).c_str());
 	return make_pair(word, count);
@@ -60,13 +59,9 @@ unsigned int calculateType(MPI_Datatype datatype) {
 
 pair< string, int> receiveFromAnyBloq(MPI_Datatype datatype){
 	MPI_Status status;
-	cout << "Probando..." << endl;
 	MPI_Probe(MPI_ANY_SOURCE, 0, MPI_COMM_WORLD, &status);
 	int messageSize;
-	cout << "Mensaje de " << status.MPI_SOURCE << " Con id " << status.MPI_TAG << endl;	
-	cout << "Cuanto?..." << endl;
 	MPI_Get_count(&status, datatype, &messageSize);
-	cout << "Creo arreglo de " << messageSize << endl;
 
 	unsigned int totalSize = messageSize*calculateType(datatype);	
 
@@ -76,13 +71,11 @@ pair< string, int> receiveFromAnyBloq(MPI_Datatype datatype){
 		data[i] = 0;
 	}
 
-	cout << "Leo de " << status.MPI_SOURCE << endl;
 	MPI_Recv(data, totalSize, datatype, status.MPI_SOURCE, status.MPI_TAG, MPI_COMM_WORLD, &status);
 
 	// Descarta basuras poniendo el total que quiero leer del buffer...no se porque a veces llega basura.
 	string res(data, totalSize);
 
-	cout << "Data de nodo es " << res << endl;
 	delete data;
 	return make_pair(res, status.MPI_SOURCE);
 }
@@ -125,11 +118,8 @@ static void load(list<string> params) {
     }
     int p;
     while(it != params.end()){
-		cout << "File " << *it << endl;
-		cout << "Entra a 2do while" << endl;
 		pair<string, int> response = receiveFromAnyBloq(MPI_CHAR);
 		msgNotRead--;
-		cout << "Recibe de " << response.second << endl;
 		p = response.second;
 		string fileReady = "r";
 		if(response.first.compare(fileReady) == 0 ){
@@ -142,7 +132,6 @@ static void load(list<string> params) {
 		}
 	}
 
-	cout << "# Mensajes no liberados " << msgNotRead << endl;
 
 	for(int i = 0; i < msgNotRead; i++){
 		receiveFromAnyBloq(MPI_CHAR);//Liberamos buffer de mensajes
@@ -170,7 +159,6 @@ static void maximum() {
 	char op = SHORT_MAXIMUM;
 	sendInst(op, NULL, 0);
 
-	cout << "Vamo a leer" << endl;
 	while(nReadyCount < np-1){
 		pair<string, int> response = receiveFromAnyBloq(MPI_CHAR);
 		pair<string, int> message = parseMessage(response.first);
@@ -178,17 +166,14 @@ static void maximum() {
 		string word = message.first;
 		int count = message.second;
 
-		cout << "Recibe " << word << " Count " << count << endl;
 
 		if(count == 0){
 //			nReadyArr[process - 1] = true;
 			nReadyCount++;
 
-			cout << "Nuevo ready " << nReadyCount << endl;
 			continue;
 		}
 
-		cout << "Agregamo " << word << " Veces " << count << endl;
 			
 		for(int i = 0; i < count; i++){			
 			hmMax.addAndInc(word);

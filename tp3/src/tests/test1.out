@@ -1,0 +1,14 @@
+[MPI] Lanzando proceso 0
+Comandos disponibles:
+  load <arch_1> <arch_2> ... <arch_n>
+  addAndInc <string>
+  member <string>
+  maximum
+  q|quit
+> [MPI] Lanzando proceso 1
+Soy un nodo. Mi rank es 1 
+[MPI] Lanzando proceso 2
+Soy un nodo. Mi rank es 2 
+La lista esta procesada
+> El máximo es <auto,4>
+> 

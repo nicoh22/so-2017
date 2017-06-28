@@ -21,7 +21,6 @@ static unsigned int myRank;
 HashMap local;// Creo un HashMap local
 void nodo(unsigned int rank_param) {
     printf("Soy un nodo. Mi rank es %d \n", rank_param);
-    	//np = np_param; Sera que si podemos tocar esta firma? Si no tenemos que mandar mensajes solo por esto
 	myRank = rank_param;
 	char operation;
 	MPI_Status status;
@@ -72,12 +71,9 @@ void nodoLoad(char *data){
 		{
 			local.addAndInc(word);
 	    }
-		cout << "Process " << myRank << " make the load of " << data << endl;
 	}
 	myfile.close();
-	cout << "Enviando ready..." << myRank << endl;
 	MPI_Ssend("r", 1, MPI_CHAR, 0, 0, MPI_COMM_WORLD);
-	cout << "Ready leido... " << myRank << endl;
 }
 void nodoAdd(char *data){
 
@@ -99,11 +95,9 @@ void nodoAdd(char *data){
 void nodoMember(char *data){
 	bool esta = local.member(data); 
 	
-	cout << "En nodo " << myRank << " clave existe: " << esta << endl;
 
 	trabajarArduamente();
 
-	cout << "Nodo " << myRank << " Termina trabajo arduo" << endl;
 
     MPI_Gather(
         &esta,
@@ -117,14 +111,10 @@ void nodoMember(char *data){
 }
 
 void nodoMaximum(){
-	MPI_Request req;
 	string actual;
 	int count = 0;
 	char *packedCount = (char *) &count; 
 	trabajarArduamente();
-	int flag = 1;
-	MPI_Status status;
-	cout << "Empezamo a enviar en nodo " << myRank << endl;
 	for(HashMap::iterator it = local.begin(); it !=local.end(); it++){
 		if(count == 0) {
 			// Solo la primera vez
@@ -137,20 +127,10 @@ void nodoMaximum(){
 			//Empaquetamos la cantidad de repeticiones de la palabra a enviar.		
 			actual.append(packedCount, 4);
 
-			// Hay que hacer esto...Isend no es buffereado! O ver de usar Bsend (Hay que crear de antemano un buffer...)
-			while (!flag)
-			{
-				MPI_Test(&req, &flag, &status);
-			}
-			
-			cout << "Envia " << actual << " Rep " << count << endl;
-			cout << "Tamanio " << actual.size() << " nodo " << myRank << endl;
 			
 			// Se estaba mandando el puntero a un string...eso puede ser cualquiera.
 			const char *cactual = actual.c_str();
-			MPI_Isend(cactual, actual.size(), MPI_CHAR, 0, 0, MPI_COMM_WORLD, &req);
-			MPI_Test(&req, &flag, &status);
-			cout << "Leido " << flag << endl;
+			MPI_Send(cactual, actual.size(), MPI_CHAR, 0, 0, MPI_COMM_WORLD);
 			actual = *it;			
 			count = 1;
 		}
@@ -159,13 +139,7 @@ void nodoMaximum(){
 	//Un cero en char y un cero en int.
 	char buffer[] = {0, 0, 0, 0, 0};
 	// Hay que hacer esto...Isend no es buffereado! O ver de usar Bsend (Hay que crear de antemano un buffer...)
-	while (!flag)
-	{
-		MPI_Test(&req, &flag, &status);
-	}
-
-	cout << "Envia " << buffer << " nodo " << myRank << endl;
-	MPI_Isend(buffer, 5, MPI_CHAR, 0, 0, MPI_COMM_WORLD, &req);
+	MPI_Send(buffer, 5, MPI_CHAR, 0, 0, MPI_COMM_WORLD);
 }
 
 void nodoQuit(){
