@@ -17,19 +17,20 @@ $(BIN): $(SRCS)
 
 clean:
 	rm -f $(BIN)
+	rm -f tests/*.out
 
 new: clean all
 
 tests: test1 test2 test3
 
 test1: dist_hashmap
-	cat tests/test1.test | $(MPIRUN) -host localhost -np 5 ./$(BIN) | grep -E 'El máximo|El string' > tests/test1.out 
+	cat tests/test1.test | $(MPIRUN) -host localhost -np 5 ./$(BIN) | grep -E 'El máximo|El string' | sed "s/^> //" > tests/test1.out 
 	diff tests/test1.out tests/test1.expected
 
 test2: dist_hashmap
-	cat tests/test2.test | $(MPIRUN) -host localhost -np 3 ./$(BIN) | grep -E 'El máximo|El string' > tests/test2.out
+	cat tests/test2.test | $(MPIRUN) -host localhost -np 3 ./$(BIN) | grep -E 'El máximo|El string' | sed "s/^> //" > tests/test2.out
 	diff tests/test2.out tests/test2.expected
 
 test3: dist_hashmap
-	cat tests/test3.test | $(MPIRUN) -host localhost -np 5 ./$(BIN) | grep -E 'El máximo|El string' > tests/test3.out
+	cat tests/test3.test | $(MPIRUN) -host localhost -np 5 ./$(BIN) | grep -E 'El máximo|El string' | sed "s/^> //" > tests/test3.out
 	diff tests/test3.out tests/test3.expected
