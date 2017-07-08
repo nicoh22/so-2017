@@ -20,13 +20,13 @@ static unsigned int myRank;
 
 HashMap local;// Creo un HashMap local
 void nodo(unsigned int rank_param) {
-    printf("Soy un nodo. Mi rank es %d \n", rank_param);
+	printf("Soy un nodo. Mi rank es %d \n", rank_param);
 	myRank = rank_param;
 	char operation;
 	MPI_Status status;
 	int sizeCmd;
 
-    while (true) {
+	while (true) {
 		MPI_Probe(0, 0, MPI_COMM_WORLD, &status);
 		MPI_Get_count(&status, MPI_CHAR, &sizeCmd);
 		char cmd[sizeCmd];
@@ -42,35 +42,35 @@ void nodo(unsigned int rank_param) {
 		}
 		switch(operation){
 			case SHORT_LOAD:
-				nodoLoad(data);
-				break;
+			nodoLoad(data);
+			break;
 			case SHORT_ADD:
-				nodoAdd(data);
-				break;
+			nodoAdd(data);
+			break;
 			case SHORT_MEMBER:
-				nodoMember(data);
-				break;
+			nodoMember(data);
+			break;
 			case SHORT_MAXIMUM:
-				nodoMaximum();
-				break;
+			nodoMaximum();
+			break;
 			case SHORT_QUIT:
-				nodoQuit();
-				return;
+			nodoQuit();
+			return;
 			default:
-				continue;
+			continue;
 		}
-    }
+	}
 }
 
 void nodoLoad(char *data){
-    ifstream myfile(data, ifstream::in);
-    if (myfile.is_open())
+	ifstream myfile(data, ifstream::in);
+	if (myfile.is_open())
 	{
-	    string word;
-	    while (myfile >> word )
+		string word;
+		while (myfile >> word )
 		{
 			local.addAndInc(word);
-	    }
+		}
 	}
 	myfile.close();
 	MPI_Ssend("r", 1, MPI_CHAR, 0, 0, MPI_COMM_WORLD);
@@ -100,15 +100,15 @@ void nodoMember(char *data){
 	trabajarArduamente();
 
 
-    MPI_Gather(
-        &esta,
-        1,
-        MPI_CHAR,
-        NULL,
-        0,
-        MPI_CHAR,
-        0,
-        MPI_COMM_WORLD);
+	MPI_Gather(
+		&esta,
+		1,
+		MPI_CHAR,
+		NULL,
+		0,
+		MPI_CHAR,
+		0,
+		MPI_COMM_WORLD);
 }
 
 void nodoMaximum(){
@@ -117,24 +117,25 @@ void nodoMaximum(){
 	char *packedCount = (char *) &count; 
 	trabajarArduamente();
 	for(HashMap::iterator it = local.begin(); it !=local.end(); it++){
-		if(count == 0) {
-			// Solo la primera vez
-			actual = *it;
-		}
-		if(actual.compare(*it) == 0){
-			count++;
-		}
-		else{
-			//Empaquetamos la cantidad de repeticiones de la palabra a enviar.		
-			actual.append(packedCount, 4);
+		
+		actual = *it;
+		count = 0;
 
-			
-			// Se estaba mandando el puntero a un string...eso puede ser cualquiera.
-			const char *cactual = actual.c_str();
-			MPI_Ssend(cactual, actual.size(), MPI_CHAR, 0, 0, MPI_COMM_WORLD);
-			actual = *it;			
-			count = 1;
+		while(it !=local.end() && actual.compare(*it) == 0){
+			count++;
+			it++;
 		}
+		
+		//Empaquetamos la cantidad de repeticiones de la palabra a enviar.		
+		actual.append(packedCount, 4);
+
+
+		// Se estaba mandando el puntero a un string...eso puede ser cualquiera.
+		const char *cactual = actual.c_str();
+		MPI_Ssend(cactual, actual.size(), MPI_CHAR, 0, 0, MPI_COMM_WORLD);
+			
+		
+		
 	}
 
 	//Un cero en char y un cero en int.
@@ -147,6 +148,6 @@ void nodoQuit(){
 	//MPI_Finalize();
 }
 void trabajarArduamente() {
-    int r = rand() % 2500000 + 500000;
-    usleep(r);
+	int r = rand() % 2500000 + 500000;
+	usleep(r);
 }
