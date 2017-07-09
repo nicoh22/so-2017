@@ -116,7 +116,7 @@ void nodoMaximum(){
 	int count = 0;
 	char *packedCount = (char *) &count; 
 	trabajarArduamente();
-	for(HashMap::iterator it = local.begin(); it !=local.end(); it++){
+	for(HashMap::iterator it = local.begin(); it !=local.end(); ){
 		
 		actual = *it;
 		count = 0;
