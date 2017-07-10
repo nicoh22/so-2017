@@ -9,6 +9,7 @@
 #include "consola.hpp"
 #include "HashMap.hpp"
 #include "mpi.h"
+#include "utilitarios.hpp"
 
 using namespace std;
 
@@ -19,114 +20,80 @@ using namespace std;
 #define CMD_QUIT    "quit"
 #define CMD_SQUIT   "q"
 
-#define SHORT_LOAD    'l'
-#define SHORT_ADD     'a'
-#define SHORT_MEMBER  'm'
-#define SHORT_MAXIMUM 'x'
-#define SHORT_QUIT   'q'
-#define FILE_READY   "r"
+
 
 static unsigned int np;
 
-//Desempaqueta un mensaje. El mismo contiene una palabra y
-//su cantidad de repeticiones.
-pair<string, int> parseMessage(string message){
-	string word = message.substr(0, message.size() - 4);
-	int count = *((int *) message.substr(message.size() - 4, 4).c_str());
-	return make_pair(word, count);
-}
+//----------------------------------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------
 
-//Recibe de forma bloqueante cualquier mensaje de cualquier nodo.
-//Retorna el mensaje y el proceso que lo envio
+                        //UTILITARIOS//
 
-// CORRER CON: 3 nodos (2 seran slave) y hacer load de a1.txt a2.txt a3.txt
-// NOTA 1: En load siempre queda un remanente de mensajes no leidos. Hago receiveFromAnyBloq de los mismos.
-// Esto tiene que hacerse además de ser necesario para liberar el buffer, porque los sends que se hacen en load por parte de los nodos son bloqueantes. Si nadie los lee quedan bloqueados.
+//----------------------------------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------
 
-unsigned int calculateType(MPI_Datatype datatype) {
-	unsigned int mult = 1;
-
-	switch(datatype){
-		case MPI_INT:
-			mult = 4;
-			break;
-		default:
-			break;
-	}
-
-	return mult;
-}
-
-pair< string, int> receiveFromAnyBloq(MPI_Datatype datatype){
+Message receiveFromAnyBloq(){
 	MPI_Status status;
-	MPI_Probe(MPI_ANY_SOURCE, 0, MPI_COMM_WORLD, &status);
+	MPI_Probe(MPI_ANY_SOURCE, MPI_ANY_TAG, MPI_COMM_WORLD, &status);
 	int messageSize;
-	MPI_Get_count(&status, datatype, &messageSize);
-
-	unsigned int totalSize = messageSize*calculateType(datatype);	
-
-	char *data = new char[totalSize];
-
-	for (unsigned int i = 0; i < totalSize; i++) {
-		data[i] = 0;
-	}
-
-	MPI_Recv(data, totalSize, datatype, status.MPI_SOURCE, status.MPI_TAG, MPI_COMM_WORLD, &status);
-
-	// Descarta basuras poniendo el total que quiero leer del buffer...no se porque a veces llega basura.
-	string res(data, totalSize);
-
-	delete data;
-	return make_pair(res, status.MPI_SOURCE);
+	MPI_Get_count(&status, MPI_CHAR, &messageSize);
+	char data[messageSize];
+	MPI_Recv(data, messageSize, MPI_CHAR, status.MPI_SOURCE, status.MPI_TAG, MPI_COMM_WORLD, &status);
+	
+	return Message(status, data, messageSize);
 }
-//Empaqueta la operacion y la data a enviar.
-void buildMessage(char op, const char *from, int sizeArg, char* to){
-    //char to[sizeArg + 1];
-    to[0] = op;
-    
-    for(int k = 0; k < sizeArg; k++){
-        to[k + 1] = from[k];
-    }
 
-}
 //Envia a todos los nodos la instruccion con el argumento data.
-static void sendInst(char instruction, const char *data, int size){
+static void sendInst(Tag tag, const string &data){
     MPI_Request req[np];
-	char buffer[size+1];
-	buildMessage(instruction, data, size, buffer);
     for(int j = 1; ((unsigned int) j) < np; j++){
-        MPI_Isend(&buffer, size + 1, MPI_CHAR, j, 0, MPI_COMM_WORLD, &req[j]);
+        MPI_Isend(data.c_str(), data.size(), MPI_CHAR, j, tag, MPI_COMM_WORLD, &req[j]);
     }
 }
+static void sendInst(Tag tag, int data){
+    MPI_Request req[np];
+    for(Rank j = 1; j < np; j++){
+        MPI_Isend(&data, 1 , MPI_INT, j, tag, MPI_COMM_WORLD, &req[j]);
+    }
+}
+
+static void sendInst(Tag tag){
+    MPI_Request req[np];
+    for(int j = 1; ((unsigned int) j) < np; j++){
+        MPI_Isend(NULL, 0, MPI_CHAR, j, tag, MPI_COMM_WORLD, &req[j]);
+    }
+}
+
+//----------------------------------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------
+
+                        //METODOS DE CONSOLA//
+
+//----------------------------------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------
+
+
 
 // Crea un ConcurrentHashMap distribuido
 static void load(list<string> params) {
-	//char op = SHORT_LOAD;
     list<string>::iterator it=params.begin();
     MPI_Request requests[np];
 
 	int msgNotRead = 0;
 
-    for(int p = 1; ((unsigned int) p) < np; p++){
-        if(((unsigned int)p) > params.size()) break;
-		int sizeFilename = (*it).size() + 1;
-		char fileMessage[sizeFilename + 1];
-		buildMessage(SHORT_LOAD, (*it).c_str(), sizeFilename, fileMessage);
-		MPI_Isend(fileMessage, sizeFilename + 1, MPI_CHAR, p, 0, MPI_COMM_WORLD, &requests[p]);
+    for(Rank p = 1;  p < np; p++){
+        if(p > params.size()) break;
+		
+		MPI_Isend((*it).c_str(), (*it).size(), MPI_CHAR, p, LOAD, MPI_COMM_WORLD, &requests[p]);
         it++;
 		msgNotRead++;
     }
-    int p;
+
     while(it != params.end()){
-		pair<string, int> response = receiveFromAnyBloq(MPI_CHAR);
+		Message response = receiveFromAnyBloq();
 		msgNotRead--;
-		p = response.second;
-		string fileReady = "r";
-		if(response.first.compare(fileReady) == 0 ){
-			int sizeFilename = (*it).size();
-			char fileMessage[sizeFilename + 1];
-			buildMessage(SHORT_LOAD, (*it).c_str(), sizeFilename, fileMessage);
-			MPI_Isend(fileMessage, sizeFilename + 1, MPI_CHAR, p, 0, MPI_COMM_WORLD, &requests[p]);
+		if(response.tag == READY ){
+			MPI_Isend((*it).c_str(), (*it).size(), MPI_CHAR, response.rank, LOAD, MPI_COMM_WORLD, &requests[response.rank]);
 			it++;
 			msgNotRead++;
 		}
@@ -134,7 +101,7 @@ static void load(list<string> params) {
 
 
 	for(int i = 0; i < msgNotRead; i++){
-		receiveFromAnyBloq(MPI_CHAR);//Liberamos buffer de mensajes
+		receiveFromAnyBloq();//Liberamos buffer de mensajes
 	}
 
     cout << "La lista esta procesada" << endl;
@@ -142,42 +109,33 @@ static void load(list<string> params) {
 
 // Esta función debe avisar a todos los nodos que deben terminar
 static void quit() {
-	char op = SHORT_QUIT;
-	//MPI_Bcast(&op, 1, MPI_CHAR, 0, MPI_COMM_WORLD);
-	sendInst(op, NULL, 0);
+	sendInst(QUIT);
 }
 
 // Esta función calcula el máximo con todos los nodos
 static void maximum() {
-
 	HashMap hmMax;
     pair<string, unsigned int> result;
     
 //	bool nReadyArr[np - 1];
 	unsigned int nReadyCount = 0;
 
-	char op = SHORT_MAXIMUM;
-	sendInst(op, NULL, 0);
+	sendInst(MAXIMUM);
 
 	while(nReadyCount < np-1){
-		pair<string, int> response = receiveFromAnyBloq(MPI_CHAR);
-		pair<string, int> message = parseMessage(response.first);
-		int process = response.second;
-		string word = message.first;
-		int count = message.second;
+		Message response = receiveFromAnyBloq();
 
-
-		if(count == 0){
-//			nReadyArr[process - 1] = true;
+		if(response.tag == READY){
 			nReadyCount++;
-
-			continue;
-		}
-
 			
-		for(int i = 0; i < count; i++){			
-			hmMax.addAndInc(word);
-		}
+		}else{
+
+    		for(int i = 0; i < response.wordCount; i++){			
+    			hmMax.addAndInc(response.word);
+    		}
+            
+        }
+
 		
 	}
 
@@ -190,9 +148,8 @@ static void maximum() {
 static void member(string key) {
     bool esta = false;
     bool nodos[np];
-	int size = key.size();
-	char op = SHORT_MEMBER;
-	sendInst(op, key.c_str(), size);
+
+	sendInst(MEMBER, key);
 
     MPI_Gather(
         &esta,
@@ -217,31 +174,17 @@ static void member(string key) {
 
 // Esta función suma uno a *key* en algún nodo
 static void addAndInc(string key) {
-
-    //int p = chooseProcess();
-    //char buffer[key.size()];
-
-	/*
-    buffer[0] = SHORT_ADD;
-    for(unsigned int k = 0; k < key.size(); k++){
-        buffer[k + 1] = key[k];
-    }
-	*/
-
-	sendInst(SHORT_ADD, key.c_str(), key.size() + 1);
-
-	pair<string, int> winner = receiveFromAnyBloq(MPI_INT); 
-	int winnerProcess = winner.second; 
-    MPI_Request req[np];
-
-    for(unsigned int j = 1; j < np; j++){
-        MPI_Isend(&winnerProcess, 1, MPI_INT, j, 0, MPI_COMM_WORLD, &req[j]);
-    }
-
-	for(unsigned int i = 0; i < np-2; i++){
+	sendInst(ADD, key);
+    
+	Message winnerMessage = receiveFromAnyBloq(); 
+	Rank winnerProcess = winnerMessage.rank; 
+    
+    sendInst(ID, winnerProcess);
+    
+	for(Rank i = 0; i < np-2; i++){
 		//TODO: si tengo un solo nodo funca todo bien?
 		//RTA: si tenes un solo nodo ni entra el for: i < 2-2 = 0
-		receiveFromAnyBloq(MPI_INT);//Liberamos buffer de mensajes
+		receiveFromAnyBloq();//Liberamos buffer de mensajes
 	}
 
     cout << "Agregado: " << key << endl;
