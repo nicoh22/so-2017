@@ -47,7 +47,7 @@ Message receiveFromAnyBloq(){
 static void sendInst(Tag tag, const string &data){
     MPI_Request req[np];
     for(int j = 1; ((unsigned int) j) < np; j++){
-        MPI_Isend(data.c_str(), data.size(), MPI_CHAR, j, tag, MPI_COMM_WORLD, &req[j]);
+        MPI_Isend(data.c_str(), data.size() + 1, MPI_CHAR, j, tag, MPI_COMM_WORLD, &req[j]);
     }
 }
 static void sendInst(Tag tag, int data){
@@ -84,7 +84,7 @@ static void load(list<string> params) {
     for(Rank p = 1;  p < np; p++){
         if(p > params.size()) break;
 		
-		MPI_Isend((*it).c_str(), (*it).size(), MPI_CHAR, p, LOAD, MPI_COMM_WORLD, &requests[p]);
+		MPI_Isend((*it).c_str(), (*it).size() + 1, MPI_CHAR, p, LOAD, MPI_COMM_WORLD, &requests[p]);
         it++;
 		msgNotRead++;
     }

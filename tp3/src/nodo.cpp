@@ -24,7 +24,7 @@ void nodo(unsigned int rank_param) {
 	int data_size;
 
 	while (true) {
-		MPI_Probe(0, MPI_ANY_TAG, MPI_COMM_WORLD, &status);
+		MPI_Probe(CONSOLA, MPI_ANY_TAG, MPI_COMM_WORLD, &status);
 		MPI_Get_count(&status, MPI_CHAR, &data_size);
 		char data[data_size];
 
