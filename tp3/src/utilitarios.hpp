@@ -21,7 +21,6 @@ struct Message {
 		tag = (Tag)status.MPI_TAG;
 		rank = status.MPI_SOURCE;
 		if(tag==WORDMESSAGE){
-			//Por alguna razon message.size viene x 4... quien sabe no?
 			word = message.substr(0, message.size() - 4);
 			wordCount = *((int *) message.substr(message.size() - 4, 4).c_str());
 		}
