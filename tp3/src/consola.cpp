@@ -93,7 +93,7 @@ static void load(list<string> params) {
 		Message response = receiveFromAnyBloq();
 		msgNotRead--;
 		if(response.tag == READY ){
-			MPI_Isend((*it).c_str(), (*it).size(), MPI_CHAR, response.rank, LOAD, MPI_COMM_WORLD, &requests[response.rank]);
+			 MPI_Isend((*it).c_str(), (*it).size() + 1, MPI_CHAR, response.rank, LOAD, MPI_COMM_WORLD, &requests[response.rank]);
 			it++;
 			msgNotRead++;
 		}
