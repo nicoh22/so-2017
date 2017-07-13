@@ -24,7 +24,7 @@ new: clean all
 tests: test1 test2 test3
 
 test1: dist_hashmap
-	cat tests/test1.test | $(MPIRUN) -host localhost -np 5 ./$(BIN) | grep -E 'El máximo|El string' | sed "s/^> //" > tests/test1.out 
+	cat tests/test1.test | $(MPIRUN) -host localhost -np 6 ./$(BIN) | grep -E 'El máximo|El string' | sed "s/^> //" > tests/test1.out 
 	diff tests/test1.out tests/test1.expected
 
 test2: dist_hashmap
@@ -32,5 +32,5 @@ test2: dist_hashmap
 	diff tests/test2.out tests/test2.expected
 
 test3: dist_hashmap
-	cat tests/test3.test | $(MPIRUN) -host localhost -np 5 ./$(BIN) | grep -E 'El máximo|El string' | sed "s/^> //" > tests/test3.out
+	cat tests/test3.test | $(MPIRUN) -host localhost -np 6 ./$(BIN) | grep -E 'El máximo|El string' | sed "s/^> //" > tests/test3.out
 	diff tests/test3.out tests/test3.expected
