@@ -1,2 +1,1 @@
-# so-2017
-Scheduling
+# Sistemas operativos - 1c- 2017
